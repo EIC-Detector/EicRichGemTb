@@ -41,6 +41,7 @@ target_link_libraries(richtb ${Geant4_LIBRARIES} )
 #
 set(N06_SCRIPTS
     vis.mac
+    testPhotons.mac
   )
 #richtb.in richtb.out optPhoton.mac
 

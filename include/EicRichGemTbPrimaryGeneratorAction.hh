@@ -10,21 +10,23 @@ class EicRichGemTbPrimaryGeneratorMessenger;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+/** @TODO Review this class completely
+ */
 class EicRichGemTbPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
-  public:
-    EicRichGemTbPrimaryGeneratorAction();
-   ~EicRichGemTbPrimaryGeneratorAction();
+public:
+  EicRichGemTbPrimaryGeneratorAction();
+  ~EicRichGemTbPrimaryGeneratorAction();
 
-  public:
-    void GeneratePrimaries(G4Event*);
+public:
+  void GeneratePrimaries(G4Event*);
 
-    void SetOptPhotonPolar();
-    void SetOptPhotonPolar(G4double);
+  void SetOptPhotonPolar();
+  void SetOptPhotonPolar(G4double);
 
-  private:
-    G4ParticleGun* particleGun;
-    EicRichGemTbPrimaryGeneratorMessenger* gunMessenger;
+private:
+  G4ParticleGun* particleGun;
+  EicRichGemTbPrimaryGeneratorMessenger* gunMessenger;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

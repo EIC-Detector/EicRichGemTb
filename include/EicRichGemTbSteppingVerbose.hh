@@ -7,6 +7,8 @@ class EicRichGemTbSteppingVerbose;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+/** @TODO Review this class completely
+ */
 class EicRichGemTbSteppingVerbose : public G4SteppingVerbose
 {
 public:

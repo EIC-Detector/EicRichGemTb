@@ -10,6 +10,8 @@ class G4UIcmdWithADoubleAndUnit;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+/** @TODO Review this class completely
+ */
 class EicRichGemTbPrimaryGeneratorMessenger: public G4UImessenger
 {
 public:

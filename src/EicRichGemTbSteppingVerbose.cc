@@ -3,17 +3,14 @@
 #include "G4SteppingManager.hh"
 #include "G4UnitsTable.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 EicRichGemTbSteppingVerbose::EicRichGemTbSteppingVerbose()
 {}
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 EicRichGemTbSteppingVerbose::~EicRichGemTbSteppingVerbose()
 {}
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void EicRichGemTbSteppingVerbose::StepInfo()
 {
@@ -107,7 +104,6 @@ void EicRichGemTbSteppingVerbose::StepInfo()
   G4cout.precision(prec);
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void EicRichGemTbSteppingVerbose::TrackingStarted()
 {
@@ -147,4 +143,3 @@ void EicRichGemTbSteppingVerbose::TrackingStarted()
   G4cout.precision(prec);
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -7,6 +7,8 @@
 class EicRichGemTbSteppingAction;
 class G4UIcmdWithABool;
 
+/** @TODO Review this class completely
+ */
 class EicRichGemTbSteppingMessenger: public G4UImessenger
 {
 public:

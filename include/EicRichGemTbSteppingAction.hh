@@ -11,6 +11,8 @@
 class EicRichGemTbTrackingAction;
 class EicRichGemTbSteppingMessenger;
 
+/** @TODO Review this class completely
+ */
 class EicRichGemTbSteppingAction : public G4UserSteppingAction
 {
 public:

@@ -2,6 +2,7 @@
 #define EicRichGemTbMaterial_h 1
 #include "globals.hh"
 #include <vector>
+#include "G4String.hh"
 #include "G4Material.hh"
 //#include "G4MaterialTable.hh"
 #include "G4Element.hh"

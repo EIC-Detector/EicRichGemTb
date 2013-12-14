@@ -6,19 +6,21 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+/** @TODO Review this class completely
+ */
 class EicRichGemTbStackingAction : public G4UserStackingAction
 {
-  public:
-    EicRichGemTbStackingAction();
-   ~EicRichGemTbStackingAction();
+public:
+  EicRichGemTbStackingAction();
+  ~EicRichGemTbStackingAction();
 
-  public:
-    G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track* aTrack);
-    void NewStage();
-    void PrepareNewEvent();
+public:
+  G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track* aTrack);
+  void NewStage();
+  void PrepareNewEvent();
 
-  private:
-    G4int gammaCounter;
+private:
+  G4int gammaCounter;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

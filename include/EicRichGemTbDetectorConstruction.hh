@@ -1,11 +1,3 @@
-/*!
- * \file ${file_name}
- * \brief
- * \author Nils Feege <nils.feege@stonybrook.edu>
- * \version $$Revision: 1.0 $$
- * \date $$Date: 2013/11/15 18:11:08 $$
- */
-
 #ifndef EicRichGemTbDETECTORCONSTRUCTION_H_
 #define EicRichGemTbDETECTORCONSTRUCTION_H_ 1
 
@@ -48,20 +40,6 @@ private:
 
   EicRichGemTbMaterial* richTbMaterial;
   EicRichGemTbGeometry* richTbGeometry;
-
-  // Geometry
-  G4double expHall_x;
-  G4double expHall_y;
-  G4double expHall_z;
-
-  G4double tank_r;
-  G4double tank_dr;
-  G4double tank_dz;
-
-  G4double mirror_f;
-  G4double mirror_r;
-  G4double mirror_cr;
-  G4double mirror_dz;
 
 };
 

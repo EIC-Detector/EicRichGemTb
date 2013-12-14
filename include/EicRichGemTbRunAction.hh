@@ -9,18 +9,20 @@
 class G4Timer;
 class G4Run;
 
+/** @TODO Review this class completely
+ */
 class EicRichGemTbRunAction : public G4UserRunAction
 {
-  public:
-    EicRichGemTbRunAction();
-   ~EicRichGemTbRunAction();
+public:
+  EicRichGemTbRunAction();
+  ~EicRichGemTbRunAction();
 
-  public:
-    void BeginOfRunAction(const G4Run* aRun);
-    void EndOfRunAction(const G4Run* aRun);
+public:
+  void BeginOfRunAction(const G4Run* aRun);
+  void EndOfRunAction(const G4Run* aRun);
 
-  private:
-    G4Timer* timer;
+private:
+  G4Timer* timer;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

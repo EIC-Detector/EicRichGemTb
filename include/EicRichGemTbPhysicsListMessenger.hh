@@ -10,6 +10,8 @@ class G4UIcmdWithAnInteger;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+/** @TODO Review this class completely
+ */
 class EicRichGemTbPhysicsListMessenger: public G4UImessenger
 {
 public:

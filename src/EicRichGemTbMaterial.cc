@@ -262,1093 +262,133 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   // Set the Birks Constant for the Cf4 scintillator
   //fCF4->GetIonisation()->SetBirksConstant(0.126*mm/MeV);
 
+
+
+  // Now for the material properties of Surfaces
+  //
+  //Front (reflecting surface of RichTb Mirror)
+
+  G4OpticalSurface * OpticalMirrorSurface = new G4OpticalSurface("OpticalMirrorSurface");
+
+  //string mirrortype = "LHCb";
+  G4String mirrortype = "G4example";
+
+  if ( mirrortype == "LHCb" )
+    { // LHCb mirror
+      // First define wavelength in nm.
+      // For now assume that all segments have the same reflectivity.
+      // Hence the reflectivity is defined outside the loop of the
+      // the number of segments.
+      // Only the front surface is created.
+      // The abosorption length is set to a small value just to
+      // avoid photons exiting from the back of the mirror.
+      // the efficiency is for the absorption process.
+
+      G4int NumPhotonRichMirrorReflWaveLengthBins = 63;
+      G4double PhotMomWaveConv=1243.125;
+
+      //Mirror reflectivity
+      // In the following, the bins at 100 nm, and 1000nm are
+      // defined just for convenience of interpolation.
+      // They are not measured points.
+
+      static const G4double PhotonWavelengthRefl[]=
+        {100.0, 200.0, 210.0, 220.0, 230.0, 240.0, 250.0, 260.0, 270.0, 280.0,
+         290.0, 300.0, 310.0, 320.0, 330.0, 340.0, 350.0, 360.0, 370.0, 380.0,
+         390.0, 400.0, 410.0, 420.0, 430.0, 440.0, 450.0, 460.0, 470.0, 480.0,
+         490.0, 500.0, 510.0, 520.0, 530.0, 540.0, 550.0, 560.0, 570.0, 580.0,
+         590.0, 600.0, 610.0, 620.0, 630.0, 640.0, 650.0, 660.0, 670.0, 680.0,
+         690.0, 700.0, 710.0, 720.0, 730.0, 740.0, 750.0, 760.0, 770.0, 780.0,
+         790.0, 800.0, 1000.0 };
+
+      static const G4double RichTbMirrorReflectivity[]=
+        {0.0, 0.9106, 0.9232, 0.9285, 0.9314, 0.9323, 0.9312, 0.9287, 0.9264,
+         0.9234, 0.9195, 0.9156, 0.9109, 0.9066, 0.9022, 0.8981, 0.8925, 0.8883,
+         0.8836, 0.8796, 0.8756, 0.8727, 0.8697, 0.8672, 0.8653, 0.8636, 0.8624,
+         0.8612, 0.8608, 0.8601, 0.8601, 0.8601, 0.8600, 0.8603, 0.8603, 0.8604,
+         0.8605, 0.8608, 0.8609, 0.8608, 0.8608, 0.8606, 0.8604, 0.8600, 0.8598,
+         0.8591, 0.8581, 0.8573, 0.8563, 0.8549, 0.8535, 0.8517, 0.8497, 0.8475,
+         0.8447, 0.8417, 0.8382, 0.8388, 0.8296, 0.8258, 0.8204, 0.8172, 0.8172 };
+
+      static const G4double RichTbMirrorEfficiency[]=
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0 };
+
+      G4double* PhotonMomentumRefl
+        =new G4double[NumPhotonRichMirrorReflWaveLengthBins];
+      G4double* PhotWaveRefl =
+        new  G4double[NumPhotonRichMirrorReflWaveLengthBins];
+      G4double* PhotReflEff =new  G4double[NumPhotonRichMirrorReflWaveLengthBins];
+      G4double* MirrorQuRefIndex
+        =new  G4double[NumPhotonRichMirrorReflWaveLengthBins];
+
+      for (G4int ibin=0; ibin<NumPhotonRichMirrorReflWaveLengthBins; ibin++){
+        PhotonMomentumRefl[ibin]=PhotMomWaveConv*eV/ PhotonWavelengthRefl[ibin];
+        PhotWaveRefl[ibin]=  RichTbMirrorReflectivity[ibin];
+        PhotReflEff[ibin]= RichTbMirrorEfficiency[ibin];
+        //the following lines to avoid reflection at the mirror.
+
+        MirrorQuRefIndex[ibin] = 1.40;
+      }
+
+      OpticalMirrorSurface->SetType(dielectric_metal);
+      OpticalMirrorSurface->SetModel(glisur);
+      OpticalMirrorSurface->SetFinish(polished);
+
+      G4MaterialPropertiesTable* OpticalMirrorSurfaceMPT = new G4MaterialPropertiesTable();
+
+      OpticalMirrorSurfaceMPT->AddProperty("RINDEX",
+                                           PhotonMomentumRefl,
+                                           MirrorQuRefIndex,
+                                           NumPhotonRichMirrorReflWaveLengthBins);
+      OpticalMirrorSurfaceMPT->AddProperty("REFLECTIVITY",
+                                           PhotonMomentumRefl,
+                                           PhotWaveRefl,
+                                           NumPhotonRichMirrorReflWaveLengthBins);
+      OpticalMirrorSurfaceMPT->AddProperty("EFFICIENCY",
+                                           PhotonMomentumRefl,
+                                           PhotReflEff,
+                                           NumPhotonRichMirrorReflWaveLengthBins);
+
+      OpticalMirrorSurface->SetMaterialPropertiesTable(OpticalMirrorSurfaceMPT);
+
+      OpticalMirrorSurface->DumpInfo();
+    } // end LHCb mirror
+
+  else if ( mirrortype == "G4example" )
+    { // test from G4 example
+      const G4int NUM = 2;
+
+      G4double pp[NUM] = {2.038*eV, 4.144*eV};
+      G4double specularlobe[NUM] = {0.3, 0.3};
+      G4double specularspike[NUM] = {0.2, 0.2};
+      G4double backscatter[NUM] = {0.1, 0.1};
+      G4double rindex[NUM] = {1.35, 1.40};
+      G4double reflectivity[NUM] = {1.0, 1.0};
+      G4double efficiency[NUM] = {0.0, 0.0};
+
+      G4MaterialPropertiesTable* SMPT = new G4MaterialPropertiesTable();
+
+      SMPT -> AddProperty("RINDEX",pp,rindex,NUM);
+      SMPT -> AddProperty("SPECULARLOBECONSTANT",pp,specularlobe,NUM);
+      SMPT -> AddProperty("SPECULARSPIKECONSTANT",pp,specularspike,NUM);
+      SMPT -> AddProperty("BACKSCATTERCONSTANT",pp,backscatter,NUM);
+      SMPT -> AddProperty("REFLECTIVITY",pp,reflectivity,NUM);
+      SMPT -> AddProperty("EFFICIENCY",pp,efficiency,NUM);
+
+      OpticalMirrorSurface->SetMaterialPropertiesTable(SMPT);
+
+      OpticalMirrorSurface->DumpInfo();
+    } // end test
+
   return;
 
 }
-//  G4double a,z,density;  //a=mass of a mole;
-//  // z=mean number of protons;
-//  G4String name,symbol;
-//  //G4int isz,isn;    //isz= number of protons in an isotope;
-//  //isn= number of nucleons in an isotope;
-//
-//
-//  G4int numel,natoms;  //numel=Number of elements constituting a material.
-//  G4double fractionmass;
-//  G4double temperature, pressure;
-//  // G4double FactorOne=1.0;
-//  G4UnitDefinition::BuildUnitsTable();
-//
-//  //PhotonEnergy
-//  G4int ibin=0;
-//  G4double PhotonEnergyStep=(PhotonMaxEnergy-PhotonMinEnergy)/
-//    NumPhotWaveLengthBins;
-//  G4double* PhotonMomentum=new G4double[NumPhotWaveLengthBins];
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    PhotonMomentum[ibin]=PhotonMinEnergy+PhotonEnergyStep*ibin;
-//  }
-//
-//  G4cout << "\nNow Define Elements ..\n" <<G4endl;
-//
-//  // Nitrogen
-//
-//  a=14.01*g/mole;
-//  G4Element* elN = new G4Element(name="Nitrogen",
-//                                 symbol="N", z=7., a);
-//
-//  //Oxygen
-//
-//  a=16.00*g/mole;
-//  G4Element* elO = new G4Element(name="Oxygen",
-//                                 symbol="O", z=8., a);
-//
-//  //Hydrogen
-//
-//  a=1.01*g/mole;
-//  G4Element* elH = new G4Element(name="Hydrogen",
-//                                 symbol="H",z=1.,a);
-//
-//  //Carbon
-//
-//  a=12.01*g/mole;
-//  G4Element* elC = new G4Element(name="Carbon",
-//                                 symbol="C",z=6.,a);
-//
-//  //Silicon
-//
-//  a=28.09*g/mole;
-//  G4Element* elSi = new G4Element(name="Silicon",
-//                                  symbol="Si",z=14.,a);
-//  //Fluorine
-//  a=18.998*g/mole;
-//  G4Element* elF = new G4Element(name="Fluorine",
-//                                 symbol="F",z=9.,a);
-//  //Aluminum
-//  a=26.98*g/mole;
-//  G4Element* elAL =new G4Element(name="Aluminium",
-//                                 symbol="Al",z=13.,a);
-//
-//  //Sodium
-//  a=22.99*g/mole;
-//  G4Element* elNa = new G4Element(name="Sodium",
-//                                  symbol="Na",z=11.,a);
-//
-//  //Potassium
-//  a=39.10*g/mole;
-//  G4Element* elK = new G4Element(name="Potassium",
-//                                 symbol="K",z=19.,a);
-//
-//  //Cesium
-//
-//  // a=132.91*g/mole;
-//  // G4Element* elCs = new G4Element(name="Cesium",
-//  //                                symbol="Cs",z=55.,a);
-//
-//  //Antimony
-//
-//  a=121.76*g/mole;
-//  G4Element* elSb = new G4Element(name="Antimony",
-//                                  symbol="Sb",z=51.,a);
-//
-//
-//  //Define Materials
-//  G4cout << "\nNow Define Materials ..\n" <<G4endl;
-//  //
-//
-//  //Air at 20 degree C and 1 atm for the ambiet air.
-//  // Also Air as  a radiator material for inside the tubes.
-//  //--
-//  density = 1.205e-03*g/cm3;
-//  pressure=1.*atmosphere;
-//  temperature=293.*kelvin;
-//  G4Material* Air = new G4Material(name="Air ", density, numel=2,
-//                                   kStateGas,temperature,pressure);
-//  Air->AddElement(elN, fractionmass=0.7);
-//  Air->AddElement(elO, fractionmass=0.3);
-//
-//  G4double* AirAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//  G4double* AirRindex=new G4double[NumPhotWaveLengthBins];
-//
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    AirAbsorpLength[ibin]=1.E32*mm;
-//    AirRindex[ibin]=1.000273;
-//  }
-//  G4MaterialPropertiesTable* AirMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  AirMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                      AirAbsorpLength,NumPhotWaveLengthBins);
-//
-//  Air->SetMaterialPropertiesTable(AirMPT);
-//  EicRichGemTbAmbientAir = Air;
-//
-//
-//  density = 1.205e-03*g/cm3;
-//  pressure=1.*atmosphere;
-//  temperature=293.*kelvin;
-//  G4Material* TAir = new G4Material(name="TAir ", density, numel=2,
-//                                    kStateGas,temperature,pressure);
-//  TAir->AddElement(elN, fractionmass=0.7);
-//  TAir->AddElement(elO, fractionmass=0.3);
-//
-//  G4double* TAirAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//  G4double* TAirRindex=new G4double[NumPhotWaveLengthBins];
-//
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    TAirAbsorpLength[ibin]=1.E32*mm;
-//    TAirRindex[ibin]=1.000273;
-//  }
-//  G4MaterialPropertiesTable* TAirMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  TAirMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                       TAirAbsorpLength,NumPhotWaveLengthBins);
-//
-//  TAirMPT->AddProperty("RINDEX", PhotonMomentum,
-//                       AirRindex,NumPhotWaveLengthBins);
-//
-//  TAir->SetMaterialPropertiesTable(TAirMPT);
-//  EicRichGemTbTubeAir = TAir;
-//
-//  //Nitrogen gas.
-//
-//  density = 0.8073e-03*g/cm3;
-//  pressure = RConfig -> getPressureN2();
-//  temperature = RConfig ->getTemperatureN2();
-//
-//  G4Material* NitrogenGas = new G4Material(name="NitrogenGas ",
-//                                           density, numel=1,
-//                                           kStateGas,temperature,pressure);
-//  NitrogenGas->AddElement(elN, natoms=2);
-//
-//  G4double* NitrogenGasAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//  G4double* NitrogenGasRindex=new G4double[NumPhotWaveLengthBins];
-//  G4double* NitrogenGasPhotW=new G4double[NumPhotWaveLengthBins];
-//
-//
-//  std::vector<G4double>N2RefInd= InitN2RefIndex(pressure,temperature);
-//  std::vector<G4double>N2RefPhotW=InitN2RefPhotW();
-//
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    NitrogenGasAbsorpLength[ibin]=1.E32*mm;
-//
-//    NitrogenGasRindex[ibin]=N2RefInd[ibin];
-//    NitrogenGasPhotW[ibin]=N2RefPhotW[ibin];
-//
-//  }
-//  G4MaterialPropertiesTable* NitrogenGasMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  NitrogenGasMPT->AddProperty("ABSLENGTH",NitrogenGasPhotW,
-//                              NitrogenGasAbsorpLength,NumPhotWaveLengthBins);
-//
-//  NitrogenGasMPT->AddProperty("RINDEX", NitrogenGasPhotW,
-//                              NitrogenGasRindex,NumPhotWaveLengthBins);
-//
-//  NitrogenGas->SetMaterialPropertiesTable(NitrogenGasMPT);
-//  EicRichGemTbNitrogenGas = NitrogenGas;
-//
-//  //Water
-//  density=1.000*g/cm3;
-//  G4Material* H2O = new G4Material(name="Water",density,numel=2);
-//  H2O->AddElement(elH,natoms=2);
-//  H2O->AddElement(elO,natoms=1);
-//
-//  G4double* H2OAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//  G4double* H2ORindex=new G4double[NumPhotWaveLengthBins];
-//
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    H2OAbsorpLength[ibin]=1.E32*mm;
-//    H2ORindex[ibin]=1.33;
-//  }
-//
-//
-//  G4MaterialPropertiesTable* H2OMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  H2OMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                      H2OAbsorpLength,NumPhotWaveLengthBins);
-//
-//  H2OMPT->AddProperty("RINDEX", PhotonMomentum,
-//                      H2ORindex,NumPhotWaveLengthBins);
-//
-//  H2O->SetMaterialPropertiesTable(H2OMPT);
-//
-//
-//  EicRichGemTbH2O=H2O;
-//  //Sio2
-//  //There is a quartz for the mirror and
-//  //another quartz which is used in aerogel and
-//  // yet another quartz used for the quartz window.
-//  //Mirrorquartz
-//
-//  density=2.200*g/cm3;
-//  G4Material* SiO2MirrorQuartz = new G4Material(name="MirrorQuartz",
-//                                                density,numel=2);
-//  SiO2MirrorQuartz->AddElement(elSi,natoms=1);
-//  SiO2MirrorQuartz->AddElement(elO,natoms=2);
-//
-//  G4double* MirrorQuartzRindex=new G4double[NumPhotWaveLengthBins];
-//  G4double* MirrorQuartzAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    MirrorQuartzAbsorpLength[ibin]=0.01*mm;
-//
-//  }
-//  G4MaterialPropertiesTable* MirrorQuartzMPT =
-//    new G4MaterialPropertiesTable();
-//
-//
-//  MirrorQuartzMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                               MirrorQuartzAbsorpLength,NumPhotWaveLengthBins);
-//
-//
-//  SiO2MirrorQuartz->SetMaterialPropertiesTable(MirrorQuartzMPT);
-//  EicRichGemTbMirrorQuartz=SiO2MirrorQuartz;
-//
-//  density=2.200*g/cm3;
-//  G4Material* SiO2AerogelQuartz = new G4Material(name="AerogelQuartz",
-//                                                 density,numel=2);
-//  SiO2AerogelQuartz->AddElement(elSi,natoms=1);
-//  SiO2AerogelQuartz->AddElement(elO,natoms=2);
-//
-//  // QuartzWindow Quartz
-//  density=2.200*g/cm3;
-//  G4Material* WindowQuartz = new G4Material(name="WindowQuartz",
-//                                            density,numel=2);
-//  WindowQuartz->AddElement(elSi,natoms=1);
-//  WindowQuartz->AddElement(elO,natoms=2);
-//  G4double* WindowQuartzRindex=new G4double[NumPhotWaveLengthBins];
-//  G4double* WindowQuartzAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    WindowQuartzAbsorpLength[ibin]=1.E32*mm;
-//    WindowQuartzRindex[ibin]=1.4;
-//  }
-//  G4MaterialPropertiesTable* WindowQuartzMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  WindowQuartzMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                               WindowQuartzAbsorpLength,NumPhotWaveLengthBins);
-//
-//  WindowQuartzMPT->AddProperty("RINDEX", PhotonMomentum,
-//                               WindowQuartzRindex,NumPhotWaveLengthBins);
-//  WindowQuartz->SetMaterialPropertiesTable(WindowQuartzMPT);
-//
-//  EicRichGemTbQuartzWindowMaterial=WindowQuartz;
-//  //for now this is kept to be same as the hpdquartz window.
-//  density=2.200*g/cm3;
-//  G4Material* HpdWindowQuartz = new G4Material(name="HpdWindowQuartz",
-//                                               density,numel=2);
-//  HpdWindowQuartz->AddElement(elSi,natoms=1);
-//  HpdWindowQuartz->AddElement(elO,natoms=2);
-//  G4double* HpdWindowQuartzRindex=new G4double[NumPhotWaveLengthBins];
-//  G4double* HpdWindowQuartzAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    HpdWindowQuartzAbsorpLength[ibin]=1.E32*mm;
-//    HpdWindowQuartzRindex[ibin]=1.40;
-//  }
-//  G4MaterialPropertiesTable* HpdWindowQuartzMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  HpdWindowQuartzMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                                  HpdWindowQuartzAbsorpLength,NumPhotWaveLengthBins);
-//
-//  HpdWindowQuartzMPT->AddProperty("RINDEX", PhotonMomentum,
-//                                  HpdWindowQuartzRindex,NumPhotWaveLengthBins);
-//  HpdWindowQuartz->SetMaterialPropertiesTable(HpdWindowQuartzMPT);
-//
-//  HpdQuartzWindowMaterial=HpdWindowQuartz;
-//
-//  // Borosilcate window of the Pad Hpd
-//  // for now kept same as the other Hpd.
-//  density=2.200*g/cm3;
-//  G4Material* PadHpdWindowQuartz = new G4Material(name="PadHpdWindowQuartz",
-//                                                  density,numel=2);
-//  PadHpdWindowQuartz->AddElement(elSi,natoms=1);
-//  PadHpdWindowQuartz->AddElement(elO,natoms=2);
-//  G4double* PadHpdWindowQuartzRindex=new G4double[NumPhotWaveLengthBins];
-//  G4double* PadHpdWindowQuartzAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    PadHpdWindowQuartzAbsorpLength[ibin]=1.E32*mm;
-//    PadHpdWindowQuartzRindex[ibin]=1.40;
-//  }
-//  G4MaterialPropertiesTable* PadHpdWindowQuartzMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  PadHpdWindowQuartzMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                                     PadHpdWindowQuartzAbsorpLength,NumPhotWaveLengthBins);
-//
-//  PadHpdWindowQuartzMPT->AddProperty("RINDEX", PhotonMomentum,
-//                                     PadHpdWindowQuartzRindex,NumPhotWaveLengthBins);
-//  PadHpdWindowQuartz->SetMaterialPropertiesTable(PadHpdWindowQuartzMPT);
-//
-//  PadHpdQuartzWindowMaterial=PadHpdWindowQuartz;
-//  //
-//  //
-//
-//  G4int filterNumberThisRun=RConfig->GetFilterTNumber();
-//  // now for the filter material glass d263
-//  density=2.200*g/cm3;
-//  G4Material* GlassD263 = new G4Material(name= FilterTypeString[0],
-//                                         density,numel=2);
-//  GlassD263->AddElement(elSi,natoms=1);
-//  GlassD263->AddElement(elO,natoms=2);
-//
-//  if(filterNumberThisRun >= 0 ) {
-//
-//    //in the following the +2 is to match the materialproperty bins
-//    // for the various materials, to avoid the tons of printout from G4.
-//    // Please see the explanation below for getting the abosorption
-//    // length of aerogel. The same comments apply here as well.
-//    // Essentially the measured transmission input here is a combination of
-//    // the bulk absorption and the fresnel surface loss. One needs to
-//    // decouple them. Here a partial attempt is made to avoid
-//    // modifying the G4OpBoundary process. SE. 15-11-2002.
-//    G4double* GlassD263Rindex=new G4double[NumPhotBinGlassD263Trans+2];
-//    G4double* GlassD263AbsorpLength=new G4double[NumPhotBinGlassD263Trans+2];
-//    G4double* GlassD263MomValue = new G4double[NumPhotBinGlassD263Trans+2];
-//    G4double* currBulkTransFilter = new G4double[NumPhotBinGlassD263Trans+2];
-//    FilterTrData* CurFil = RConfig->GetFilterTrData();
-//    std::vector<G4double>GlassD263TransWL = CurFil-> GetTransWL();
-//    std::vector<G4double>GlassD263Transmis = CurFil->GetTransTotValue();
-//    G4double FilterHalfZ= CurFil->GetCurFilterThickness();
-//
-//    for (ibin=0; ibin<NumPhotBinGlassD263Trans+2; ibin++){
-//
-//
-//      GlassD263Rindex[ibin]=RefIndexGlassD263;
-//      if(ibin > 0 && ibin < NumPhotBinGlassD263Trans+1 ){
-//        //now using the formula trans=std::exp(-thickness/absorplength).
-//        G4int ibina=ibin-1;
-//
-//        if(GlassD263TransWL[ibina] > 0.0 ) {
-//          GlassD263MomValue[ibin]= PhotMomWaveConv*eV/GlassD263TransWL[ibina];
-//        }
-//        if(GlassD263Transmis[ibina] >0.0 ) {
-//          // G4double currentfilterRefIndex= GlassD263Rindex[ibin];
-//          G4double currentAdjacentMediumRefIndex=NitrogenNominalRefIndex;
-//          // the following needs to be improved in the future
-//          // to have a binary search and
-//          // interpolation between the adjacent
-//          // array elements etc. SE 15-11-2002.
-//          for(size_t ibinr=0; ibinr<N2RefPhotW.size()-1 ; ibinr++){
-//            G4double currMomA=GlassD263MomValue[ibin];
-//            if(currMomA >= N2RefPhotW[ibinr] && currMomA <= N2RefPhotW[ibinr+1]){
-//              currentAdjacentMediumRefIndex=N2RefInd[ibinr];
-//            }
-//
-//          }
-//
-//          if( GlassD263Transmis[ibina] > 0.01 ) {
-//            currBulkTransFilter[ibin]=
-//              GetCurrentBulkTrans(GlassD263Rindex[ibin],
-//                                  currentAdjacentMediumRefIndex,
-//                                  GlassD263Transmis[ibina]);
-//          } else {
-//            currBulkTransFilter[ibin]=GlassD263Transmis[ibina];
-//
-//          }
-//          if(currBulkTransFilter[ibin] > 0.0 &&
-//             currBulkTransFilter[ibin] < 0.9995 ) {
-//            GlassD263AbsorpLength[ibin]=
-//              -(2.0*FilterHalfZ)/(std::log(currBulkTransFilter[ibin]));
-//          }else if (currBulkTransFilter[ibin]== 0.0 ) {
-//            GlassD263AbsorpLength[ibin]=FilterHalfZ/1.0E32;
-//          }else {
-//            GlassD263AbsorpLength[ibin]=DBL_MAX;
-//          }
-//        }else {
-//
-//          GlassD263AbsorpLength[ibin]=FilterHalfZ/1.0E32;
-//        }
-//      }
-//
-//    }
-//    GlassD263MomValue[0]=PhotonMaxEnergy;
-//    GlassD263AbsorpLength[0]=GlassD263AbsorpLength[1];
-//    currBulkTransFilter[0]=currBulkTransFilter[1];
-//
-//    G4int mbin=NumPhotBinGlassD263Trans+1;
-//    GlassD263MomValue[mbin]=PhotonMinEnergy;
-//    GlassD263AbsorpLength[mbin]=GlassD263AbsorpLength[mbin-1];
-//    currBulkTransFilter[mbin]=currBulkTransFilter[mbin-1];
-//
-//    G4MaterialPropertiesTable* GlassD263MPT =
-//      new G4MaterialPropertiesTable();
-//
-//    GlassD263MPT->AddProperty("ABSLENGTH",GlassD263MomValue,
-//                              GlassD263AbsorpLength,NumPhotBinGlassD263Trans+2);
-//
-//    GlassD263MPT->AddProperty("RINDEX",GlassD263MomValue,
-//                              GlassD263Rindex,NumPhotBinGlassD263Trans+2);
-//
-//    GlassD263->SetMaterialPropertiesTable(GlassD263MPT);
-//  }
-//
-//  GlassD263FilterMaterial=GlassD263;
-//  EicRichGemTbFilterMaterial[0]=GlassD263;
-//  //for the G4Example only 1 filter type is used.
-//  G4cout << " Now Define Aerogel .." <<G4endl;
-//
-//
-//  //Aerogel upto five types considered so far.
-//  // in the G4example the same type is repeated 5 times.
-//  //Now for TypeA
-//
-//  density=0.200*g/cm3;
-//
-//  G4Material* AerogTypeA =
-//    new G4Material(name=AerogelTypeString[0], density, numel=2);
-//  AerogTypeA->AddMaterial(SiO2AerogelQuartz, fractionmass=97.0*perCent);
-//  AerogTypeA->AddMaterial(H2O, fractionmass=3.0*perCent);
-//
-//
-//  G4double* AerogTypeARindex=new G4double[NumPhotWaveLengthBins];
-//  G4double* AerogTypeAAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//  G4double* AerogTypeARScatLength = new G4double[NumPhotWaveLengthBins];
-//  G4double* currentAgelTrans = new G4double[NumPhotWaveLengthBins];
-//
-//  std::vector<G4double>AerogelTypeASLength = GetAerogelRScatLength(AerogelTypeA);
-//  G4int AerogNumber=0;
-//  G4double AerogelLength=GetCurAerogelLength(AerogNumber);
-//  G4double MaxTotTransmission=AerogelTypeATotTrans;
-//  // Unfortunately the transmission measurement values only give the
-//  // total transmission which includes the loss within aerogel
-//  // and the Fresnel loss at the surface. In order to
-//  // partially decouple this, the approximate loss at the
-//  // the surface is calculated using the ref index of the
-//  // aerogel and its surroundings. Then this is added to the
-//  // measured transmission to get the transmission in the bulk of
-//  // aerogel. This is then converted to an absorption length.
-//  // In a more accurate implementation the loss at the surface
-//  // should be calculated using a more precise formula. It is
-//  // difficult since we do not know the direction of the photons
-//  // at this point.
-//  // One possibility is to modify the G4opBoundaryProcess
-//  // for this, since we do know the direction of the photons by then.
-//  // This is not done for this G4example, but only in the LHCb implementation.
-//  // SE 15-11-2002.
-//  // The aerogel is inside a volume made of Nitrogen
-//
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    AerogTypeARindex[ibin]= ConvertAgelRIndex(PhotonMomentum[ibin],0);
-//    AerogTypeARScatLength[ibin]=AerogelTypeASLength[ibin];
-//    // G4double photwl = PhotMomWaveConv/ (PhotonMomentum[ibin]/eV);
-//
-//    G4double currentAgelRefIndex=  AerogTypeARindex[ibin];
-//    G4double currentNeighbourRefIndex= N2RefInd[ibin];
-//    currentAgelTrans[ibin]=
-//      GetCurrentBulkTrans( currentAgelRefIndex,
-//                           currentNeighbourRefIndex,MaxTotTransmission);
-//    //now using the formula trans=std::exp(-thickness/absorplength)
-//    // to get the absorplength.
-//
-//    if( currentAgelTrans[ibin] > 0.0 && currentAgelTrans[ibin] < 0.9995) {
-//      AerogTypeAAbsorpLength[ibin]=
-//        -(AerogelLength)/(std::log( currentAgelTrans[ibin]));
-//    }else if (currentAgelTrans[ibin] == 0.0) {
-//
-//      AerogTypeAAbsorpLength[ibin]=AerogelLength/1.0E32;
-//    }else {
-//
-//      AerogTypeAAbsorpLength[ibin]=DBL_MAX;
-//    }
-//
-//  }
-//
-//  G4MaterialPropertiesTable* AerogTypeAMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  AerogTypeAMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                             AerogTypeAAbsorpLength,NumPhotWaveLengthBins);
-//
-//
-//  AerogTypeAMPT->AddProperty("RAYLEIGH",PhotonMomentum,
-//                             AerogTypeARScatLength,NumPhotWaveLengthBins);
-//
-//  AerogTypeAMPT->AddProperty("RINDEX", PhotonMomentum,
-//                             AerogTypeARindex,NumPhotWaveLengthBins);
-//
-//  AerogTypeA->SetMaterialPropertiesTable(AerogTypeAMPT);
-//
-//
-//  EicRichGemTbAerogelTypeA = AerogTypeA;
-//  EicRichGemTbAerogelMaterial[0] = AerogTypeA;
-//  // In the G4example the same type is repeated 5 times.
-//  // in the LHCb implementation 5 types of aerogel materials used.
-//  //Now for Aerogel TypeB
-//
-//  EicRichGemTbAerogelTypeB = AerogTypeA;
-//  EicRichGemTbAerogelMaterial[1] = AerogTypeA;
-//
-//  //Now for aerogel TypeC
-//
-//  EicRichGemTbAerogelTypeC = AerogTypeA;
-//  EicRichGemTbAerogelMaterial[2] = AerogTypeA;
-//
-//  //Now for aerogel TypeD
-//
-//  EicRichGemTbAerogelTypeD = AerogTypeA;
-//  EicRichGemTbAerogelMaterial[3] = AerogTypeA;
-//
-//  //Now for aerogel Type E
-//
-//
-//  EicRichGemTbAerogelTypeE = AerogTypeA;
-//  EicRichGemTbAerogelMaterial[4] = AerogTypeA;
-//
-//
-//
-//  //Bialkali Photocathode
-//
-//  //the following numbers on the property of the BiAlkali Photocathode
-//  // may not be accurate.
-//  //Some number is is jut put in for initial program test purposes.
-//  density=0.100*g/cm3;
-//  G4Material* BiAlkaliPhCathode = new G4Material(name="BiAlkaliPhCathode",
-//                                                 density, numel=3);
-//  BiAlkaliPhCathode->AddElement(elNa, fractionmass=37.5*perCent);
-//  BiAlkaliPhCathode->AddElement(elK, fractionmass=37.5*perCent);
-//  BiAlkaliPhCathode->AddElement(elSb, fractionmass=25.0*perCent);
-//
-//  //for now  properties for the ph cathode material.
-//
-//  G4double* BiAlkaliPhCathodeRindex=new G4double[NumPhotWaveLengthBins];
-//  G4double* BiAlkaliPhCathodeAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//  G4double CathLen=PhotoCathodeThickness;
-//  G4double CathTrans=PhCathodeNominalTransmission;
-//  G4double CathAbsorpLen;
-//  if(CathTrans > 0.0 && CathTrans < 0.9995 ) {
-//    CathAbsorpLen =  -(CathLen)/(std::log(CathTrans));
-//  }else if (CathTrans > 0.0) {
-//    CathAbsorpLen  = CathLen/1.0E32;
-//  }else {
-//    CathAbsorpLen  = DBL_MAX;
-//  }
-//
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    BiAlkaliPhCathodeAbsorpLength[ibin]=CathAbsorpLen;
-//    BiAlkaliPhCathodeRindex[ibin]=1.40;
-//  }
-//  G4MaterialPropertiesTable* BiAlkaliPhCathodeMPT =
-//    new G4MaterialPropertiesTable();
-//  BiAlkaliPhCathodeMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                                    BiAlkaliPhCathodeAbsorpLength,NumPhotWaveLengthBins);
-//
-//  BiAlkaliPhCathodeMPT->AddProperty("RINDEX", PhotonMomentum,
-//                                    BiAlkaliPhCathodeRindex,NumPhotWaveLengthBins);
-//  BiAlkaliPhCathode->SetMaterialPropertiesTable(BiAlkaliPhCathodeMPT);
-//  PadHpdPhCathodeMaterial=BiAlkaliPhCathode;
-//
-//  //CF4
-//  //no data available at room temp and pressure;
-//  density=0.003884*g/cm3;
-//  temperature=273.*kelvin;
-//  pressure=1.0*atmosphere;
-//  a=88.01*g/mole;
-//
-//  G4Material* CF4 =new G4Material(name="CF4",density,numel=2,
-//                                  kStateGas,temperature,pressure);
-//  CF4->AddElement(elC,natoms=1);
-//  CF4->AddElement(elF,natoms=4);
-//  // Sellmeir coef to be added.
-//  EicRichGemTbCF4=CF4;
-//
-//  G4cout << "\nNowDefineVacuum ..\n" <<G4endl;
-//
-//
-//  G4double* VacAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//  G4double* VacRindex=new G4double[NumPhotWaveLengthBins];
-//
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    VacAbsorpLength[ibin]=1.E32*mm;
-//    // the following ref index is just artifical, just to
-//    // avoid the refraction between nitrogen gas and hpd master.
-//    VacRindex[ibin]=1.000273;
-//  }
-//  G4MaterialPropertiesTable* VacMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  VacMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                      VacAbsorpLength,NumPhotWaveLengthBins);
-//  VacMPT->AddProperty("RINDEX", PhotonMomentum,
-//                      VacRindex,NumPhotWaveLengthBins);
-//  vacuum->SetMaterialPropertiesTable(VacMPT);
-//
-//  EicRichGemTbVacuum=vacuum;
-//
-//  //beamgas
-//  //
-//  density=1.e-5*g/cm3;
-//  pressure=2.e-2*bar;
-//  temperature=STP_Temperature;
-//  G4Material* beamgas = new G4Material(name="Beamgas",density,numel=1,
-//                                       kStateGas,temperature,pressure);
-//  beamgas->AddMaterial(Air,fractionmass=1.); // beware that air is at 20 deg;
-//
-//  //
-//  //Aluminium
-//  density=2.7*g/cm3;
-//  G4Material* Aluminium =new G4Material(name="Aluminium",density,numel=1);
-//  Aluminium->AddElement(elAL,natoms=1);
-//
-//  G4double* AluminiumAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    AluminiumAbsorpLength[ibin]=0.0*mm;
-//  }
-//
-//  G4MaterialPropertiesTable* AluminiumMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  AluminiumMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                            AluminiumAbsorpLength,NumPhotWaveLengthBins);
-//
-//  Aluminium->SetMaterialPropertiesTable(AluminiumMPT);
-//  EicRichGemTbAluminium=Aluminium;
-//  //PlasticAg , this is used as a wrap of aerogel and as upstream holder
-//  // for aerogel frame. For now use same properties as that of Aluminium.
-//  // this is just an opaque material.
-//
-//  density=2.7*g/cm3;
-//  G4Material* PlasticAg =new G4Material(name="PlasticAg",density,numel=1);
-//  PlasticAg->AddElement(elAL,natoms=1);
-//
-//  G4double* PlasticAgAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    PlasticAgAbsorpLength[ibin]=0.0*mm;
-//  }
-//
-//  G4MaterialPropertiesTable* PlasticAgMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  PlasticAgMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                            PlasticAgAbsorpLength,NumPhotWaveLengthBins);
-//
-//  PlasticAg->SetMaterialPropertiesTable(PlasticAgMPT);
-//  EicRichGemTbPlasticAg=PlasticAg;
-//  // Kovar
-//  density=2.7*g/cm3;
-//  G4Material* Kovar =new G4Material(name="Kovar",density,numel=1);
-//  Kovar->AddElement(elAL,natoms=1);
-//
-//  G4double* KovarAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    KovarAbsorpLength[ibin]=0.0*mm;
-//  }
-//
-//  G4MaterialPropertiesTable* KovarMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  KovarMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                        KovarAbsorpLength,NumPhotWaveLengthBins);
-//
-//  Kovar->SetMaterialPropertiesTable(KovarMPT);
-//  HpdTubeMaterial=Kovar;
-//
-//  // Silicon
-//
-//  density=2.33*g/cm3;
-//  G4Material* Silicon =new G4Material(name="Silicon",density,numel=1);
-//  Silicon->AddElement(elSi,natoms=1);
-//
-//  G4double* SiliconAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    SiliconAbsorpLength[ibin]=0.0*mm;
-//  }
-//
-//  G4MaterialPropertiesTable* SiliconMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  SiliconMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                          SiliconAbsorpLength,NumPhotWaveLengthBins);
-//
-//  Silicon->SetMaterialPropertiesTable(SiliconMPT);
-//  HpdSiDetMaterial=Silicon;
-//
-//  // Silicon coating made of Si02.
-//
-//  density=2.33*g/cm3;
-//  G4Material* SiliconCoating =new G4Material(name="SilCoat",density,numel=2);
-//  SiliconCoating->AddElement(elSi,natoms=1);
-//  SiliconCoating->AddElement(elO,natoms=2);
-//
-//  G4double* SiliconCoatingAbsorpLength=new G4double[NumPhotWaveLengthBins];
-//  // G4double* SiliconCoatingRindex=new G4double[NumPhotWaveLengthBins];
-//
-//  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
-//    SiliconCoatingAbsorpLength[ibin]=0.0001*mm;
-//
-//  }
-//
-//  G4MaterialPropertiesTable* SiliconCoatingMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  SiliconCoatingMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-//                                 SiliconCoatingAbsorpLength,NumPhotWaveLengthBins);
-//
-//  SiliconCoating->SetMaterialPropertiesTable(SiliconCoatingMPT);
-//  HpdSiCoatingMaterial=SiliconCoating;
-//
-//  //
-//  // Now for the material properties of Surfaces
-//  //
-//  //
-//  //
-//  //Front (reflecting surface of EicRichGemTb Mirror)
-//
-//  // First define wavelength in nm.
-//  //For now assume that all segments have the same reflectivity.
-//  // Hence the reflectivity is defined outside the loop of the
-//  // the number of segments.
-//  //Only the front surface is created.
-//  // The abosorption length is set to a small value just to
-//  // avoid photons exiting from the back of the mirror.
-//  // the efficiency is for the absorption process.
-//
-//
-//  G4double* PhotonMomentumRefl
-//    =new G4double[NumPhotonRichMirrorReflWaveLengthBins];
-//  G4double* PhotWaveRefl =
-//    new  G4double[NumPhotonRichMirrorReflWaveLengthBins];
-//  G4double* PhotReflEff =new  G4double[NumPhotonRichMirrorReflWaveLengthBins];
-//  G4double* MirrorQuRefIndex
-//    =new  G4double[NumPhotonRichMirrorReflWaveLengthBins];
-//
-//  for (ibin=0; ibin<NumPhotonRichMirrorReflWaveLengthBins; ibin++){
-//    PhotonMomentumRefl[ibin]=PhotMomWaveConv*eV/ PhotonWavelengthRefl[ibin];
-//    PhotWaveRefl[ibin]=  EicRichGemTbMirrorReflectivity[ibin];
-//    PhotReflEff[ibin]= EicRichGemTbMirrorEfficiency[ibin];
-//    //the following lines to avoid reflection at the mirror.
-//
-//    MirrorQuRefIndex[ibin] = 1.40;
-//  }
-//
-//  G4OpticalSurface * OpEicRichGemTbMirrorSurface =
-//    new G4OpticalSurface("EicRichGemTbMirrorSurface");
-//
-//  OpEicRichGemTbMirrorSurface->SetType(dielectric_metal);
-//  OpEicRichGemTbMirrorSurface->SetFinish(polished);
-//  OpEicRichGemTbMirrorSurface->SetModel(glisur);
-//  G4MaterialPropertiesTable* OpEicRichGemTbMirrorSurfaceMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  OpEicRichGemTbMirrorSurfaceMPT->AddProperty("REFLECTIVITY",
-//                                        PhotonMomentumRefl,
-//                                        PhotWaveRefl,
-//                                        NumPhotonRichMirrorReflWaveLengthBins);
-//  OpEicRichGemTbMirrorSurfaceMPT->AddProperty("EFFICIENCY",
-//                                        PhotonMomentumRefl,
-//                                        PhotReflEff,
-//                                        NumPhotonRichMirrorReflWaveLengthBins);
-//  OpEicRichGemTbMirrorSurfaceMPT->AddProperty("RINDEX",
-//                                        PhotonMomentumRefl,
-//                                        MirrorQuRefIndex,
-//                                        NumPhotonRichMirrorReflWaveLengthBins);
-//
-//  OpEicRichGemTbMirrorSurface->SetMaterialPropertiesTable(OpEicRichGemTbMirrorSurfaceMPT);
-//  EicRichGemTbOpticalMirrorSurface=OpEicRichGemTbMirrorSurface;
-//
-//
-//  //  OpEicRichGemTbMirrorSurface->DumpInfo();
-//
-//  // Now for the Surface of the Vessel Enclosure.
-//
-//
-//  G4OpticalSurface * OpEicRichGemTbEnclosureSurface =
-//    new G4OpticalSurface("EicRichGemTbEnclosureSurface");
-//  OpEicRichGemTbEnclosureSurface->SetType(dielectric_metal);
-//  OpEicRichGemTbEnclosureSurface->SetFinish(polished);
-//  OpEicRichGemTbEnclosureSurface->SetModel(glisur);
-//
-//  G4double NumPhotonRichEnclosureSurfaceWaveLengthBins=10;
-//  G4double  EicRichGemTbEnclosureSurfaceReflectivity[]=
-//    {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-//
-//  G4double EicRichGemTbEnclosureSurfaceEfficiency[]=
-//    {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-//  G4double RichEnclosureSurfacePhotMom[]=
-//    {1.0*eV,2.0*eV, 3.0*eV,4.0*eV,5.0*eV,6.0*eV,7.0*eV,8.0*eV,
-//     9.0*eV,10.0*eV};
-//
-//  G4MaterialPropertiesTable* OpEicRichGemTbEnclosureSurfaceMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  OpEicRichGemTbEnclosureSurfaceMPT->AddProperty("REFLECTIVITY",
-//                                           RichEnclosureSurfacePhotMom,
-//                                           EicRichGemTbEnclosureSurfaceReflectivity,
-//                                           static_cast<int>(NumPhotonRichEnclosureSurfaceWaveLengthBins));
-//  OpEicRichGemTbEnclosureSurfaceMPT->AddProperty("EFFICIENCY",
-//                                           RichEnclosureSurfacePhotMom,
-//                                           EicRichGemTbEnclosureSurfaceEfficiency,
-//                                           static_cast<int>(NumPhotonRichEnclosureSurfaceWaveLengthBins));
-//
-//  OpEicRichGemTbEnclosureSurface->
-//    SetMaterialPropertiesTable(OpEicRichGemTbEnclosureSurfaceMPT);
-//
-//  EicRichGemTbOpticalEnclosureSurface=OpEicRichGemTbEnclosureSurface;
-//
-//  //Now for the surface between the TAir and Quartz Window of the HPD
-//
-//  G4OpticalSurface * OpHpdQuartzWTSurface =
-//    new G4OpticalSurface("HpdQuartzWTSurface");
-//  OpHpdQuartzWTSurface->SetType(dielectric_dielectric);
-//  OpHpdQuartzWTSurface->SetFinish(polished);
-//  OpHpdQuartzWTSurface->SetModel(glisur);
-//  //OpHpdQuartzWTSurface->SetModel(unified);
-//
-//  G4double NumPhotonHpdQuartzWTSurfaceWaveLengthBins=10;
-//  G4double  HpdQuartzWTSurfaceReflectivity[]=
-//    {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-//
-//  G4double HpdQuartzWTSurfaceEfficiency[]=
-//    {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-//
-//  G4double HpdQuartzWTSurfacePhotMom[]=
-//    {1.0*eV,2.0*eV, 3.0*eV,4.0*eV,5.0*eV,6.0*eV,7.0*eV,8.0*eV,
-//     9.0*eV,10.0*eV};
-//
-//  G4MaterialPropertiesTable* OpHpdQuartzWTSurfaceMPT =
-//    new G4MaterialPropertiesTable();
-//
-//
-//  OpHpdQuartzWTSurfaceMPT->AddProperty("REFLECTIVITY",
-//                                       HpdQuartzWTSurfacePhotMom,
-//                                       HpdQuartzWTSurfaceReflectivity,
-//                                       static_cast<int>(NumPhotonHpdQuartzWTSurfaceWaveLengthBins));
-//  OpHpdQuartzWTSurfaceMPT->AddProperty("EFFICIENCY",
-//                                       HpdQuartzWTSurfacePhotMom,
-//                                       HpdQuartzWTSurfaceEfficiency,
-//                                       static_cast<int>(NumPhotonHpdQuartzWTSurfaceWaveLengthBins));
-//
-//  OpHpdQuartzWTSurface->
-//    SetMaterialPropertiesTable(OpHpdQuartzWTSurfaceMPT);
-//
-//  HpdTQuartzWSurface=OpHpdQuartzWTSurface;
-//
-//
-//
-//  //Now for the surface between the Quartz Window and Ph cathode of the HPD
-//
-//  G4OpticalSurface * OpHpdQuartzWPSurface =
-//    new G4OpticalSurface("HpdQuartzWPSurface");
-//  OpHpdQuartzWPSurface->SetType(dielectric_dielectric);
-//  OpHpdQuartzWPSurface->SetFinish(polished);
-//  OpHpdQuartzWPSurface->SetModel(glisur);
-//
-//  G4double NumPhotonHpdQuartzWPSurfaceWaveLengthBins=10;
-//  G4double  HpdQuartzWPSurfaceReflectivity[]=
-//    {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-//
-//
-//  G4double HpdQuartzWPSurfaceEfficiency[]=
-//    {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-//
-//  G4double HpdQuartzWPSurfacePhotMom[]=
-//    {1.0*eV,2.0*eV, 3.0*eV,4.0*eV,5.0*eV,6.0*eV,7.0*eV,8.0*eV,
-//     9.0*eV,10.0*eV};
-//
-//  G4MaterialPropertiesTable* OpHpdQuartzWPSurfaceMPT =
-//    new G4MaterialPropertiesTable();
-//
-//
-//  OpHpdQuartzWPSurfaceMPT->AddProperty("REFLECTIVITY",
-//                                       HpdQuartzWPSurfacePhotMom,
-//                                       HpdQuartzWPSurfaceReflectivity,
-//                                       static_cast<int>(NumPhotonHpdQuartzWPSurfaceWaveLengthBins));
-//  OpHpdQuartzWPSurfaceMPT->AddProperty("EFFICIENCY",
-//                                       HpdQuartzWPSurfacePhotMom,
-//                                       HpdQuartzWPSurfaceEfficiency,
-//                                       static_cast<int>(NumPhotonHpdQuartzWPSurfaceWaveLengthBins));
-//
-//  OpHpdQuartzWPSurface->
-//    SetMaterialPropertiesTable(OpHpdQuartzWPSurfaceMPT);
-//
-//  HpdQuartzWPhCathodeSurface=OpHpdQuartzWPSurface;
-//
-//
-//
-//  //Now for the skin surface of the PhCathode so that photons do
-//  // not come out of the Photocathode.
-//  // Changed to dielectric-dielectric so that photons DO come out
-//  // of the photocathode. SE 26-9-01.
-//
-//  G4OpticalSurface * OpPhCathodeSurface =
-//    new G4OpticalSurface("PhCathodeSurface");
-//
-//  OpPhCathodeSurface->SetType(dielectric_dielectric);
-//  OpPhCathodeSurface->SetFinish(polished);
-//  OpPhCathodeSurface->SetModel(glisur);
-//
-//
-//  G4double NumPhotonPhCathodeSurfaceWaveLengthBins=10;
-//  G4double  PhCathodeSurfaceReflectivity[]=
-//    {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-//
-//
-//  G4double PhCathodeSurfaceEfficiency[]=
-//    {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-//
-//  G4double PhCathodeSurfacePhotMom[]=
-//    {1.0*eV,2.0*eV, 3.0*eV,4.0*eV,5.0*eV,6.0*eV,7.0*eV,8.0*eV,
-//     9.0*eV,10.0*eV};
-//
-//  G4MaterialPropertiesTable* OpPhCathodeSurfaceMPT =
-//    new G4MaterialPropertiesTable();
-//
-//
-//  OpPhCathodeSurfaceMPT->AddProperty("REFLECTIVITY",
-//                                     PhCathodeSurfacePhotMom,
-//                                     PhCathodeSurfaceReflectivity,
-//                                     static_cast<int>(NumPhotonPhCathodeSurfaceWaveLengthBins));
-//  OpPhCathodeSurfaceMPT->AddProperty("EFFICIENCY",
-//                                     PhCathodeSurfacePhotMom,
-//                                     PhCathodeSurfaceEfficiency,
-//                                     static_cast<int>(NumPhotonPhCathodeSurfaceWaveLengthBins));
-//
-//  OpPhCathodeSurface->
-//    SetMaterialPropertiesTable(OpPhCathodeSurfaceMPT);
-//
-//  PhCathodeSkinSurface=OpPhCathodeSurface;
-//  PhCathodeBorderSurface=OpPhCathodeSurface;
-//
-//
-//
-//
-//  //Now for the surface between Interior of HPD and Silicon Coating.
-//
-//  G4OpticalSurface * OpHpdSiCoatSurface =
-//    new G4OpticalSurface("HpdSiCoatSurface");
-//  OpHpdSiCoatSurface->SetType(dielectric_metal);
-//  OpHpdSiCoatSurface->SetFinish(polished);
-//  OpHpdSiCoatSurface->SetModel(glisur);
-//
-//
-//  G4double NumPhotonHpdSiCoatSurfaceWaveLengthBins=10;
-//
-//  G4double  HpdSiCoatSurfaceReflectivity[]=
-//    {0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9};
-//
-//  G4double HpdSiCoatSurfaceEfficiency[]=
-//    {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-//
-//  G4double HpdSiCoatSurfacePhotMom[]=
-//    {1.0*eV,2.0*eV, 3.0*eV,4.0*eV,5.0*eV,6.0*eV,7.0*eV,8.0*eV,
-//     9.0*eV,10.0*eV};
-//  G4double HpdSiCoatSurfaceRefInd[]=
-//    {1.4,1.4,1.4,1.4,1.4,1.4,1.4,1.4,1.4,1.4};
-//
-//
-//  G4MaterialPropertiesTable* OpHpdSiCoatSurfaceMPT =
-//    new G4MaterialPropertiesTable();
-//
-//
-//  OpHpdSiCoatSurfaceMPT->AddProperty("REFLECTIVITY",
-//                                     HpdSiCoatSurfacePhotMom,
-//                                     HpdSiCoatSurfaceReflectivity,
-//                                     static_cast<int>(NumPhotonHpdSiCoatSurfaceWaveLengthBins));
-//  OpHpdSiCoatSurfaceMPT->AddProperty("EFFICIENCY",
-//                                     HpdSiCoatSurfacePhotMom,
-//                                     HpdSiCoatSurfaceEfficiency,
-//                                     static_cast<int>(NumPhotonHpdSiCoatSurfaceWaveLengthBins));
-//  OpHpdSiCoatSurfaceMPT->AddProperty("RINDEX",
-//                                     HpdSiCoatSurfacePhotMom,
-//                                     HpdSiCoatSurfaceRefInd,
-//                                     static_cast<int>(NumPhotonHpdSiCoatSurfaceWaveLengthBins));
-//
-//  OpHpdSiCoatSurface->
-//    SetMaterialPropertiesTable(OpHpdSiCoatSurfaceMPT);
-//
-//  HpdSiCoatSurface=OpHpdSiCoatSurface;
-//
-//
-//
-//  // Now for the Surface of the MetalTube of HPD.
-//
-//
-//  G4OpticalSurface * OpEicRichGemTbHpdMetalSurface =
-//    new G4OpticalSurface("EicRichGemTbHpdMetalSurface");
-//  OpEicRichGemTbHpdMetalSurface->SetType(dielectric_metal);
-//  OpEicRichGemTbHpdMetalSurface->SetFinish(polished);
-//  OpEicRichGemTbHpdMetalSurface->SetModel(glisur);
-//
-//  G4double NumPhotonHpdMetalSurfaceWaveLengthBins=10;
-//  G4double  RichHpdMetalSurfaceReflectivity[]=
-//    {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-//
-//  G4double RichHpdMetalSurfaceEfficiency[]=
-//    {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-//  G4double RichHpdMetalSurfacePhotMom[]=
-//    {1.0*eV,2.0*eV, 3.0*eV,4.0*eV,5.0*eV,6.0*eV,7.0*eV,8.0*eV,
-//     9.0*eV,10.0*eV};
-//
-//  G4MaterialPropertiesTable* OpEicRichGemTbHpdMetalSurfaceMPT =
-//    new G4MaterialPropertiesTable();
-//
-//  OpEicRichGemTbHpdMetalSurfaceMPT->AddProperty("REFLECTIVITY",
-//                                          RichHpdMetalSurfacePhotMom,
-//                                          RichHpdMetalSurfaceReflectivity,
-//                                          static_cast<int>(NumPhotonHpdMetalSurfaceWaveLengthBins));
-//  OpEicRichGemTbHpdMetalSurfaceMPT->AddProperty("EFFICIENCY",
-//                                          RichHpdMetalSurfacePhotMom,
-//                                          RichHpdMetalSurfaceEfficiency,
-//                                          static_cast<int>(NumPhotonHpdMetalSurfaceWaveLengthBins));
-//
-//  OpEicRichGemTbHpdMetalSurface->
-//    SetMaterialPropertiesTable(OpEicRichGemTbHpdMetalSurfaceMPT);
-//
-//  EicRichGemTbOpticalHpdMetalSurface=OpEicRichGemTbHpdMetalSurface;
-//
-//
-//  //Now for the surface of the Filter
-//
-//  G4OpticalSurface * OpEicRichGemTbFilterSurface =
-//    new G4OpticalSurface("EicRichGemTbFilterSurface");
-//  OpEicRichGemTbFilterSurface->SetType(dielectric_dielectric);
-//  OpEicRichGemTbFilterSurface->SetFinish(polished);
-//  OpEicRichGemTbFilterSurface->SetModel(glisur);
-//
-//
-//
-//  if(filterNumberThisRun >= 0 ) {
-//
-//    G4int FilterNumbins=NumPhotonEicRichGemTbFilterSurfaceWaveLengthBins;
-//
-//
-//    G4double*  FilterReflectivity = new G4double(FilterNumbins);
-//    G4double* FilterEff =new G4double(FilterNumbins);
-//    G4double* FilterPhotMom =new G4double(FilterNumbins);
-//
-//
-//    for(G4int ibinf =0 ; ibinf < FilterNumbins; ibinf++ ){
-//      FilterReflectivity[ibinf]= EicRichGemTbFilterSurfaceReflectivity[ibinf];
-//      FilterEff[ibinf]= EicRichGemTbFilterSurfaceEfficiency[ibinf];
-//      FilterPhotMom[ibinf]= EicRichGemTbFilterSurfacePhotMom[ibinf];
-//
-//      //       G4MaterialPropertiesTable* OpEicRichGemTbFilterSurfaceMPT =
-//      //                         new G4MaterialPropertiesTable();
-//
-//    }
-//    EicRichGemTbOpticalFilterSurface=OpEicRichGemTbFilterSurface;
-//
-//  }
-//
-//  delete [] PhotonMomentum;
-//  delete [] AirAbsorpLength;
-//  delete [] AirRindex;
-//  delete [] MirrorQuartzRindex;
-//  delete [] MirrorQuartzAbsorpLength;
-//  delete [] WindowQuartzRindex;
-//  delete [] WindowQuartzAbsorpLength;
-//  delete [] AluminiumAbsorpLength;
-//  delete [] KovarAbsorpLength;
-//  delete [] PhotonMomentumRefl;
-//
-//
-//}
-
-EicRichGemTbMaterial::~EicRichGemTbMaterial(){ ; }
 
 
-
+EicRichGemTbMaterial::~EicRichGemTbMaterial(){ }

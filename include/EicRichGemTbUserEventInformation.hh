@@ -5,6 +5,8 @@
 #ifndef EicRichGemTbUserEventInformation_h
 #define EicRichGemTbUserEventInformation_h 1
 
+/** @TODO Review this class completely
+ */
 class EicRichGemTbUserEventInformation : public G4VUserEventInformation
 {
   public:

@@ -16,6 +16,8 @@ class EicRichGemTbPhysicsListMessenger;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+/** @TODO Review this class completely
+ */
 class EicRichGemTbPhysicsList : public G4VUserPhysicsList
 {
 public:

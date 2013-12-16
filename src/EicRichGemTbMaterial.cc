@@ -6,6 +6,7 @@
 #include "EicRichGemTbMaterial.hh"
 
 #include "G4Isotope.hh"
+#include "G4NistManager.hh"
 #include "G4Element.hh"
 #include "G4ElementTable.hh"
 #include "G4Material.hh"
@@ -33,14 +34,34 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   G4int nelements;
   G4int natoms;
 
-  // Elements
+  //  // Elements
+  //  //
+  //  H  = new G4Element("Hydrogen", "H", z=1 , a=1.01*g/mole);
+  //  N  = new G4Element("Nitrogen", "N", z=7 , a=14.01*g/mole);
+  //  O  = new G4Element("Oxygen"  , "O", z=8 , a=16.00*g/mole);
+  //  C  = new G4Element("Carbon", "C", z=6 , a=12.01*g/mole);
+  //  F  = new G4Element("Fluorine", "F", z=9 , a=19.00*g/mole);
+
+  // G4 database on G4Elements
+  G4NistManager* manager = G4NistManager::Instance();
+  manager->SetVerbose(0);
   //
-  H  = new G4Element("Hydrogen", "H", z=1 , a=1.01*g/mole);
-  N  = new G4Element("Nitrogen", "N", z=7 , a=14.01*g/mole);
-  O  = new G4Element("Oxygen"  , "O", z=8 , a=16.00*g/mole);
-  C  = new G4Element("Carbon", "C", z=6 , a=12.01*g/mole);
-  F  = new G4Element("Fluorine", "F", z=9 , a=19.00*g/mole);
-  Si = new G4Element("Silicon", "Si", z=14, a=28.09*g/mole);
+  // define Elements
+  //
+
+  H  = manager->FindOrBuildElement(1);
+  N  = manager->FindOrBuildElement(7);
+  O  = manager->FindOrBuildElement(8);
+  C  = manager->FindOrBuildElement(6);
+  F  = manager->FindOrBuildElement(9);
+  Si = manager->FindOrBuildElement(14);
+  I  = manager->FindOrBuildElement(53);
+  Cs = manager->FindOrBuildElement(55);
+
+  //Ge = manager->FindOrBuildElement(32);
+  //Sb = manager->FindOrBuildElement(51);
+  //Pb = manager->FindOrBuildElement(82);
+  //Bi = manager->FindOrBuildElement(83);
 
 
   //Vacuum
@@ -76,6 +97,21 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
 
   CF4->AddElement(C, 1);
   CF4->AddElement(F, 4);
+
+
+  // CsI
+  //
+  CsI = new G4Material("CsI", density= 4.534*g/cm3, nelements=2);
+  CsI->AddElement(Cs, natoms=1);
+  CsI->AddElement(I , natoms=1);
+  //CsI->GetIonisation()->SetMeanExcitationEnergy(553.1*eV);
+
+
+  // Stainless Steel
+  //
+  StainlessSteel = new G4Material("StainlessSteel",density=8.96*g/cm3,nelements=1);
+  StainlessSteel->AddElement(O, 1.);
+
 
   // Aluminum
   //
@@ -113,21 +149,29 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   SiO2MirrorQuartz->AddElement(Si,natoms=1);
   SiO2MirrorQuartz->AddElement(O,natoms=2);
 
+  G4int NumPhotWaveLengthBins = 2;
+
+  G4double MirrorQuartzRindex[2]={1.35,1.35};
+  G4double MirrorQuartzAbsorpLength[2]={1,1};
+
+  G4double PhotonMomentum[2]={0.1*eV,1000*eV};
+
   //  G4double* MirrorQuartzRindex=new G4double[NumPhotWaveLengthBins];
   //  G4double* MirrorQuartzAbsorpLength=new G4double[NumPhotWaveLengthBins];
+
   //  for (ibin=0; ibin<NumPhotWaveLengthBins; ibin++){
   //    MirrorQuartzAbsorpLength[ibin]=0.01*mm;
   //
   //  }
-  //  G4MaterialPropertiesTable* MirrorQuartzMPT =
-  //    new G4MaterialPropertiesTable();
-  //
-  //
-  //  MirrorQuartzMPT->AddProperty("ABSLENGTH",PhotonMomentum,
-  //                               MirrorQuartzAbsorpLength,NumPhotWaveLengthBins);
-  //
-  //
-  //  SiO2MirrorQuartz->SetMaterialPropertiesTable(MirrorQuartzMPT);
+  G4MaterialPropertiesTable* MirrorQuartzMPT =
+    new G4MaterialPropertiesTable();
+
+
+  MirrorQuartzMPT->AddProperty("ABSLENGTH",PhotonMomentum,
+                               MirrorQuartzAbsorpLength,NumPhotWaveLengthBins);
+
+
+  SiO2MirrorQuartz->SetMaterialPropertiesTable(MirrorQuartzMPT);
 
 
   // Generate & Add Material Properties Table
@@ -268,9 +312,9 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   //
   //Front (reflecting surface of RichTb Mirror)
 
-  G4OpticalSurface * OpticalMirrorSurface = new G4OpticalSurface("OpticalMirrorSurface");
+  OpticalMirrorSurface = new G4OpticalSurface("OpticalMirrorSurface");
 
-  //string mirrortype = "LHCb";
+  //G4String mirrortype = "LHCb";
   G4String mirrortype = "G4example";
 
   if ( mirrortype == "LHCb" )
@@ -336,7 +380,8 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
         MirrorQuRefIndex[ibin] = 1.40;
       }
 
-      OpticalMirrorSurface->SetType(dielectric_metal);
+      //      OpticalMirrorSurface->SetType(dielectric_metal);
+      OpticalMirrorSurface->SetType(dielectric_dielectric);
       OpticalMirrorSurface->SetModel(glisur);
       OpticalMirrorSurface->SetFinish(polished);
 
@@ -365,23 +410,28 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
       const G4int NUM = 2;
 
       G4double pp[NUM] = {2.038*eV, 4.144*eV};
-      G4double specularlobe[NUM] = {0.3, 0.3};
-      G4double specularspike[NUM] = {0.2, 0.2};
-      G4double backscatter[NUM] = {0.1, 0.1};
-      G4double rindex[NUM] = {1.35, 1.40};
+      //G4double specularlobe[NUM] = {0.3, 0.3};
+      //G4double specularspike[NUM] = {0.2, 0.2};
+      //G4double backscatter[NUM] = {0.1, 0.1};
+      //G4double rindex[NUM] = {1.35, 1.40};
+      G4double rindex[NUM] = {1.4, 1.4};
       G4double reflectivity[NUM] = {1.0, 1.0};
       G4double efficiency[NUM] = {0.0, 0.0};
 
       G4MaterialPropertiesTable* SMPT = new G4MaterialPropertiesTable();
 
       SMPT -> AddProperty("RINDEX",pp,rindex,NUM);
-      SMPT -> AddProperty("SPECULARLOBECONSTANT",pp,specularlobe,NUM);
-      SMPT -> AddProperty("SPECULARSPIKECONSTANT",pp,specularspike,NUM);
-      SMPT -> AddProperty("BACKSCATTERCONSTANT",pp,backscatter,NUM);
+      //SMPT -> AddProperty("SPECULARLOBECONSTANT",pp,specularlobe,NUM);
+      //SMPT -> AddProperty("SPECULARSPIKECONSTANT",pp,specularspike,NUM);
+      //SMPT -> AddProperty("BACKSCATTERCONSTANT",pp,backscatter,NUM);
       SMPT -> AddProperty("REFLECTIVITY",pp,reflectivity,NUM);
       SMPT -> AddProperty("EFFICIENCY",pp,efficiency,NUM);
 
-      OpticalMirrorSurface->SetMaterialPropertiesTable(SMPT);
+      //OpticalMirrorSurface->SetMaterialPropertiesTable(SMPT);
+
+      OpticalMirrorSurface->SetType(dielectric_metal);
+      OpticalMirrorSurface->SetModel(glisur);
+      OpticalMirrorSurface->SetFinish(polished);
 
       OpticalMirrorSurface->DumpInfo();
     } // end test

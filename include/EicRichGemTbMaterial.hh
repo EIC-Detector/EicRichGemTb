@@ -23,6 +23,9 @@ public:
   G4Material* getCF4() {return CF4;}
   G4Material* getAluminum() {return Aluminum;}
 
+  G4Material* getStainlessSteel() {return StainlessSteel;}
+  G4Material* getCsI() {return CsI;}
+
   G4OpticalSurface* getOpticalMirrorSurface() {return OpticalMirrorSurface;}
 
 private:
@@ -32,10 +35,14 @@ private:
   G4Element* C;
   G4Element* F;
   G4Element* Si;
+  G4Element* I;
+  G4Element* Cs;
 
   G4Material* Vacuum;
   G4Material* AmbientAir;
   G4Material* CF4;
+  G4Material* CsI;
+  G4Material* StainlessSteel;
   G4Material* Aluminum;
   G4Material* SiO2MirrorQuartz;
 

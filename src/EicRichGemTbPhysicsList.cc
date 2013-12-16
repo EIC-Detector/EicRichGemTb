@@ -256,9 +256,9 @@ void EicRichGemTbPhysicsList::ConstructOp()
       pmanager->SetProcessOrdering(theCerenkovProcess,idxPostStep);
     }
     if (theScintillationProcess->IsApplicable(*particle)) {
-   //   pmanager->AddProcess(theScintillationProcess);
-   //   pmanager->SetProcessOrderingToLast(theScintillationProcess, idxAtRest);
-   //   pmanager->SetProcessOrderingToLast(theScintillationProcess, idxPostStep);
+      pmanager->AddProcess(theScintillationProcess);
+      pmanager->SetProcessOrderingToLast(theScintillationProcess, idxAtRest);
+      pmanager->SetProcessOrderingToLast(theScintillationProcess, idxPostStep);
     }
     if (particleName == "opticalphoton") {
       G4cout << " AddDiscreteProcess to OpticalPhoton " << G4endl;

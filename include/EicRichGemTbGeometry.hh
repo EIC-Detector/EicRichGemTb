@@ -26,6 +26,11 @@ public:
   G4double GetMirrorPositionZ() {return mirror_pos_z; }
   G4double GetMirrorCylinderSphereDistanceZ() {return mirror_cyl_sphere_dist_z; }
 
+  G4double GetCsILayerX() {return csilayer_x; }
+  G4double GetCsILayerY() {return csilayer_y; }
+  G4double GetCsILayerZ() {return csilayer_z; }
+  G4double GetCsILayerPositionZ() {return csilayer_pos_z; }
+
 private:
 
   G4double world_x;
@@ -42,6 +47,11 @@ private:
   G4double mirror_cyl_l;
   G4double mirror_sphere_r;
   G4double mirror_cyl_sphere_dist_z;
+
+  G4double csilayer_x;
+  G4double csilayer_y;
+  G4double csilayer_z;
+  G4double csilayer_pos_z;
 
 };
 

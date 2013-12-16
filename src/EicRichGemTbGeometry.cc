@@ -26,9 +26,14 @@ void EicRichGemTbGeometry::SetDefault(){
 
   mirror_pos_z = (0.5 * pressVess_dz - 0.5 * mirror_cyl_l);
 
-  //G4double mirror_d = sqrt(mirror_r*mirror_r - mirror_cr*mirror_cr); // distance center sphere to beginning cylinder
-  //G4double mirror_cdz = ( mirror_r - mirror_d ) + mirror_dz; // full mirror cylinder length
-  //mirror_cyl_sphere_dist_z = -(mirror_d + 0.5 * mirror_cdz);
+  // simple assumption: curvature extends half way along cylinder, i.e. minimum mirror thickness = 0.5 * maximum mirror thickness
+  mirror_cyl_sphere_dist_z = -( mirror_sphere_r );
+
+
+  csilayer_x = 10.0 * cm;
+  csilayer_y = 10.0 * cm;
+  csilayer_z = 0.001 * mm;
+  csilayer_pos_z = -0.5 * GetPressureVesselLength() + 2.0 * cm;
 
   return;
 

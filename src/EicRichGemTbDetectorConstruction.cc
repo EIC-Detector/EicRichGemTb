@@ -1,5 +1,6 @@
 #include "EicRichGemTbDetectorConstruction.hh"
 
+#include "globals.hh"
 #include "G4ProductionCuts.hh"
 #include "G4Tubs.hh"
 #include "G4ThreeVector.hh"
@@ -83,7 +84,7 @@ G4VPhysicalVolume* EicRichGemTbDetectorConstruction::Construct()
                                      );
 
   G4LogicalVolume* pressVess_log = new G4LogicalVolume(pressVess_cyl,
-                                                       getRichTbMaterial()->getAluminum(),
+                                                       getRichTbMaterial()->getStainlessSteel(),
                                                        "PressureVessel",
                                                        0, 0, 0 );
 
@@ -142,14 +143,15 @@ G4VPhysicalVolume* EicRichGemTbDetectorConstruction::Construct()
 
   /** @TODO Get mirror geometry right.
    */
-  //G4VSolid *richMirror = new G4SubtractionSolid("RICHMirror", richMirrorCylinder, richMirrorSphere_place);
+  G4VSolid *richMirror = new G4SubtractionSolid("RICHMirror", richMirrorCylinder, richMirrorSphere_shift);
   //G4VSolid *richMirror = new G4UnionSolid("RICHMirror", richMirrorCylinder, richMirrorSphere_shift);
   //G4VSolid *richMirror = new G4UnionSolid("RICHMirror", richMirrorCylinder, richMirrorCylinder);
 
   //  G4LogicalVolume *richMirror_log = new G4LogicalVolume(richMirror,
-  G4LogicalVolume *richMirror_log = new G4LogicalVolume(richMirrorCylinder,
-                                                        //getRichTbMaterial()->getMirrorQuartz(),
-                                                        getRichTbMaterial()->getAluminum(),
+  G4LogicalVolume *richMirror_log = new G4LogicalVolume(richMirror,
+                                                        getRichTbMaterial()->getMirrorQuartz(),
+                                                        //getRichTbMaterial()->getCF4(),
+                                                        //getRichTbMaterial()->getAluminum(),
                                                         "RICHMirror",
                                                         0, 0, 0);
 
@@ -157,14 +159,35 @@ G4VPhysicalVolume* EicRichGemTbDetectorConstruction::Construct()
                                                          G4ThreeVector(0, 0, getRichTbGeometry()->GetMirrorPositionZ()),
                                                          richMirror_log,
                                                          "RICHMirror",
-                                                         world_log,false,0);
+                                                         gasVol_log,false, false);
 
 
   /** @TODO Add RICH photocathode
    */
-  // The RICH Photocathode
+  // The RICH Photocathode = CsI layer
   //
-  // ...
+  G4Box* layerCsI_box = new G4Box("CsILayer",
+                                  0.5 * getRichTbGeometry()->GetCsILayerX(),
+                                  0.5 * getRichTbGeometry()->GetCsILayerY(),
+                                  0.5 * getRichTbGeometry()->GetCsILayerZ()
+                                  );
+
+  G4LogicalVolume* layerCsI_log = new G4LogicalVolume(layerCsI_box,
+                                                      getRichTbMaterial()->getCsI(),
+                                                      "CsILayer",
+                                                      0,
+                                                      0,
+                                                      0
+                                                      );
+
+  G4VPhysicalVolume* layerCsI_phys = new G4PVPlacement(0,
+                                                       G4ThreeVector(0, 0, getRichTbGeometry()->GetCsILayerPositionZ()),
+                                                       layerCsI_log,
+                                                       "CsILayer",
+                                                       gasVol_log,
+                                                       false,
+                                                       0 );
+
 
   /** @TODO Add RICH readout for GEM stack
    */
@@ -179,9 +202,13 @@ G4VPhysicalVolume* EicRichGemTbDetectorConstruction::Construct()
                                                                      gasVol_phys, richMirror_phys,
                                                                      getRichTbMaterial()->getOpticalMirrorSurface() );
 
-  //  G4LogicalSkinSurface* MirrorSurface = new G4LogicalSkinSurface("RichTbMirrorSurface",
-  //                                                                 richMirror_log,
-  //                                                                 getRichTbMaterial()->getOpticalMirrorSurface() );
+  //  G4LogicalBorderSurface* MirrorSurface = new G4LogicalBorderSurface("RichTbMirrorSurface",
+  //                                                                     gasVol_phys, world_phys,
+  //                                                                     getRichTbMaterial()->getOpticalMirrorSurface() );
+
+  //G4LogicalSkinSurface* MirrorSurface = new G4LogicalSkinSurface("RichTbMirrorSurface",
+  //                                                             richMirror_log,
+  //                                                             getRichTbMaterial()->getOpticalMirrorSurface() );
 
   MirrorSurface->GetName(); // avoid warning for unused variable during compilation
 

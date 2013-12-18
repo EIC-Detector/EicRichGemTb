@@ -13,8 +13,8 @@ void EicRichGemTbGeometry::SetDefault(){
   world_y = 1.0 * m;
   world_z = 3.0 * m;
 
-  pressVess_r_inner = 40.0 * cm;
-  pressVess_dr = 10.0 * cm;
+  pressVess_r_inner = 20.0 * cm;
+  pressVess_dr = 2.0 * cm;
   pressVess_dz = 100.0 * cm;
 
   mirror_f = 1.0 * m;
@@ -30,10 +30,10 @@ void EicRichGemTbGeometry::SetDefault(){
   mirror_cyl_sphere_dist_z = -( mirror_sphere_r );
 
 
-  csilayer_x = 10.0 * cm;
-  csilayer_y = 10.0 * cm;
-  csilayer_z = 0.001 * mm;
-  csilayer_pos_z = -0.5 * GetPressureVesselLength() + 2.0 * cm;
+  gemstack_x = 10.0 * cm;
+  gemstack_y = 10.0 * cm;
+  gemstack_z =  5.0 * cm;
+  gemstack_pos_z = - 0.5 * ( GetPressureVesselLength() - GetGEMStackZ() ) ;
 
   return;
 

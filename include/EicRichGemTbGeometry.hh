@@ -26,10 +26,10 @@ public:
   G4double GetMirrorPositionZ() {return mirror_pos_z; }
   G4double GetMirrorCylinderSphereDistanceZ() {return mirror_cyl_sphere_dist_z; }
 
-  G4double GetCsILayerX() {return csilayer_x; }
-  G4double GetCsILayerY() {return csilayer_y; }
-  G4double GetCsILayerZ() {return csilayer_z; }
-  G4double GetCsILayerPositionZ() {return csilayer_pos_z; }
+  G4double GetGEMStackX() {return gemstack_x; }
+  G4double GetGEMStackY() {return gemstack_y; }
+  G4double GetGEMStackZ() {return gemstack_z; }
+  G4double GetGEMStackPositionZ() {return gemstack_pos_z; }
 
 private:
 
@@ -48,10 +48,10 @@ private:
   G4double mirror_sphere_r;
   G4double mirror_cyl_sphere_dist_z;
 
-  G4double csilayer_x;
-  G4double csilayer_y;
-  G4double csilayer_z;
-  G4double csilayer_pos_z;
+  G4double gemstack_x;
+  G4double gemstack_y;
+  G4double gemstack_z;
+  G4double gemstack_pos_z;
 
 };
 

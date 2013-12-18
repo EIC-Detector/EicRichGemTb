@@ -310,7 +310,9 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
 
   // Now for the material properties of Surfaces
   //
+
   //Front (reflecting surface of RichTb Mirror)
+  //
 
   OpticalMirrorSurface = new G4OpticalSurface("OpticalMirrorSurface");
 
@@ -436,6 +438,21 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
       OpticalMirrorSurface->DumpInfo();
     } // end test
 
+  // GEM stack photocathode (CsI coating of top GEM)
+  //
+  OpticalPhotocathodeSurface = new G4OpticalSurface("OpticalPhotocathodeSurface", glisur, polished, dielectric_metal);
+
+  G4double photocath_EPHOTON[2]={1.,1000.};
+  G4double photocath_EFF[2]={1.,1.};
+  G4double photocath_REFL[2]={0.,0.};
+
+  G4MaterialPropertiesTable* OpticalPhotocathodeSurface_MPT = new G4MaterialPropertiesTable();
+  OpticalPhotocathodeSurface_MPT->AddProperty("EFFICIENCY",photocath_EPHOTON,photocath_EFF,2);
+  OpticalPhotocathodeSurface_MPT->AddProperty("REFLECTIVITY",photocath_EPHOTON,photocath_REFL,2);
+  OpticalPhotocathodeSurface->SetMaterialPropertiesTable(OpticalPhotocathodeSurface_MPT);
+
+  // done
+  //
   return;
 
 }

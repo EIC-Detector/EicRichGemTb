@@ -27,6 +27,7 @@ public:
   G4Material* getCsI() {return CsI;}
 
   G4OpticalSurface* getOpticalMirrorSurface() {return OpticalMirrorSurface;}
+  G4OpticalSurface* getOpticalPhotocathodeSurface() {return OpticalPhotocathodeSurface;}
 
 private:
   G4Element* H;
@@ -47,6 +48,7 @@ private:
   G4Material* SiO2MirrorQuartz;
 
   G4OpticalSurface* OpticalMirrorSurface;
+  G4OpticalSurface* OpticalPhotocathodeSurface;
 
 };
 

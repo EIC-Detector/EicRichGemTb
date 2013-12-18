@@ -1,4 +1,5 @@
 #include "EicRichGemTbDetectorConstruction.hh"
+#include "EicRichGemTbSD.hh"
 
 #include "globals.hh"
 #include "G4ProductionCuts.hh"
@@ -113,15 +114,11 @@ G4VPhysicalVolume* EicRichGemTbDetectorConstruction::Construct()
   G4VPhysicalVolume* gasVol_phys = new G4PVPlacement(0,
                                                      G4ThreeVector(),
                                                      gasVol_log,
-                                                     "Gas",
+                                                     "GasVolume",
                                                      world_log,false,0);
 
   // The RICH Mirror
   //
-  // LHCb website: 3mm thick Be base + 0.3mm glass surface layer coated with Al.
-  // LHCb TDR: The mirrors are made of polished 6mm-thick glass coated by vacuum
-  //           deposition with 900 nm of aluminium and overcoated with 200 nm of quartz.
-
   G4Tubs* richMirrorCylinder = new G4Tubs("RICHMirrorCylinder"
                                           ,
                                           0,
@@ -141,17 +138,11 @@ G4VPhysicalVolume* EicRichGemTbDetectorConstruction::Construct()
                                                            G4ThreeVector(0, 0, getRichTbGeometry()->GetMirrorCylinderSphereDistanceZ()) );
   richMirrorSphere_shift->GetName(); // avoid warning for unused variable during compilation
 
-  /** @TODO Get mirror geometry right.
-   */
   G4VSolid *richMirror = new G4SubtractionSolid("RICHMirror", richMirrorCylinder, richMirrorSphere_shift);
-  //G4VSolid *richMirror = new G4UnionSolid("RICHMirror", richMirrorCylinder, richMirrorSphere_shift);
-  //G4VSolid *richMirror = new G4UnionSolid("RICHMirror", richMirrorCylinder, richMirrorCylinder);
 
-  //  G4LogicalVolume *richMirror_log = new G4LogicalVolume(richMirror,
   G4LogicalVolume *richMirror_log = new G4LogicalVolume(richMirror,
-                                                        getRichTbMaterial()->getMirrorQuartz(),
-                                                        //getRichTbMaterial()->getCF4(),
-                                                        //getRichTbMaterial()->getAluminum(),
+                                                        //getRichTbMaterial()->getMirrorQuartz(),
+                                                        getRichTbMaterial()->getAluminum(),
                                                         "RICHMirror",
                                                         0, 0, 0);
 
@@ -160,40 +151,6 @@ G4VPhysicalVolume* EicRichGemTbDetectorConstruction::Construct()
                                                          richMirror_log,
                                                          "RICHMirror",
                                                          gasVol_log,false, false);
-
-
-  /** @TODO Add RICH photocathode
-   */
-  // The RICH Photocathode = CsI layer
-  //
-  G4Box* layerCsI_box = new G4Box("CsILayer",
-                                  0.5 * getRichTbGeometry()->GetCsILayerX(),
-                                  0.5 * getRichTbGeometry()->GetCsILayerY(),
-                                  0.5 * getRichTbGeometry()->GetCsILayerZ()
-                                  );
-
-  G4LogicalVolume* layerCsI_log = new G4LogicalVolume(layerCsI_box,
-                                                      getRichTbMaterial()->getCsI(),
-                                                      "CsILayer",
-                                                      0,
-                                                      0,
-                                                      0
-                                                      );
-
-  G4VPhysicalVolume* layerCsI_phys = new G4PVPlacement(0,
-                                                       G4ThreeVector(0, 0, getRichTbGeometry()->GetCsILayerPositionZ()),
-                                                       layerCsI_log,
-                                                       "CsILayer",
-                                                       gasVol_log,
-                                                       false,
-                                                       0 );
-
-
-  /** @TODO Add RICH readout for GEM stack
-   */
-  // The RICH Readout and GEM Stack
-  //
-  // ...
 
 
   // Mirror surface
@@ -211,6 +168,48 @@ G4VPhysicalVolume* EicRichGemTbDetectorConstruction::Construct()
   //                                                             getRichTbMaterial()->getOpticalMirrorSurface() );
 
   MirrorSurface->GetName(); // avoid warning for unused variable during compilation
+
+
+  // The RICH Photon Detection: CsI Cathode, GEM Stack, segemnted readout plane
+  // For now: implemented as vacuum volume with absorbing surface
+  //
+  G4Box* GEMStack_box = new G4Box("GEMStack",
+                                  0.5 * getRichTbGeometry()->GetGEMStackX(),
+                                  0.5 * getRichTbGeometry()->GetGEMStackY(),
+                                  0.5 * getRichTbGeometry()->GetGEMStackZ()
+                                  );
+
+  G4LogicalVolume* GEMStack_log = new G4LogicalVolume(GEMStack_box,
+                                                      getRichTbMaterial()->getVacuum(),
+                                                      "GEMStack",
+                                                      0,
+                                                      0,
+                                                      0
+                                                      );
+
+  G4VPhysicalVolume* GEMStack_phys = new G4PVPlacement(0,
+                                                       G4ThreeVector(0, 0, getRichTbGeometry()->GetGEMStackPositionZ()),
+                                                       GEMStack_log,
+                                                       "GEMStack",
+                                                       gasVol_log,
+                                                       false,
+                                                       0 );
+
+  // Give GEM stack an optical surface
+  //
+  G4LogicalSkinSurface* PhotocathodeSurface = new G4LogicalSkinSurface("PhotocathodeSurface",GEMStack_log,getRichTbMaterial()->getOpticalPhotocathodeSurface());
+
+  // Make photocathode sensitive Detector
+  //
+  G4SDManager* SDman = G4SDManager::GetSDMpointer();
+  G4String photoSDname = "/EicRichGemTbDet/photoSD";
+  G4String photoHitColname="PhotoHitsCollection";
+
+  EicRichGemTbSD* photoSD = new EicRichGemTbSD( photoSDname, photoHitColname );
+
+  SDman->AddNewDetector( photoSD );
+  GEMStack_log->SetSensitiveDetector( photoSD );
+
 
   // always return the physical World
   //

@@ -2,7 +2,7 @@
 //#include "EicRichGemTbEventAction.hh"
 //#include "EicRichGemTbTrackingAction.hh"
 //#include "EicRichGemTbTrajectory.hh"
-//#include "EicRichGemTbPMTSD.hh"
+#include "EicRichGemTbSD.hh"
 //#include "EicRichGemTbUserTrackInformation.hh"
 //#include "EicRichGemTbUserEventInformation.hh"
 #include "EicRichGemTbSteppingMessenger.hh"
@@ -52,23 +52,22 @@ void EicRichGemTbSteppingAction::UserSteppingAction(const G4Step * theStep){
   G4StepPoint* thePostPoint = theStep->GetPostStepPoint();
   G4VPhysicalVolume* thePostPV = thePostPoint->GetPhysicalVolume();
 
-  //  G4OpBoundaryProcessStatus boundaryStatus=Undefined;
-  //  static G4OpBoundaryProcess* boundary=NULL;
-  //
-  //  //find the boundary process only once
-  //  if(!boundary){
-  //    G4ProcessManager* pm
-  //      = theStep->GetTrack()->GetDefinition()->GetProcessManager();
-  //    G4int nprocesses = pm->GetProcessListLength();
-  //    G4ProcessVector* pv = pm->GetProcessList();
-  //    G4int i;
-  //    for( i=0;i<nprocesses;i++){
-  //      if((*pv)[i]->GetProcessName()=="OpBoundary"){
-  //        boundary = (G4OpBoundaryProcess*)(*pv)[i];
-  //        break;
-  //      }
-  //    }
-  //  }
+  G4OpBoundaryProcessStatus boundaryStatus=Undefined;
+  static G4OpBoundaryProcess* boundary=NULL;
+
+  //find the boundary process only once
+  if(!boundary){
+    G4ProcessManager* pm  = theStep->GetTrack()->GetDefinition()->GetProcessManager();
+    G4int nprocesses = pm->GetProcessListLength();
+    G4ProcessVector* pv = pm->GetProcessList();
+    G4int i;
+    for( i=0;i<nprocesses;i++){
+      if((*pv)[i]->GetProcessName()=="OpBoundary"){
+        boundary = (G4OpBoundaryProcess*)(*pv)[i];
+        break;
+      }
+    }
+  }
 
   if(theTrack->GetParentID()==0){
     //This is a primary track
@@ -95,84 +94,82 @@ void EicRichGemTbSteppingAction::UserSteppingAction(const G4Step * theStep){
     //      }
     //    }
 
-    if(fOneStepPrimaries&&thePrePV->GetName()=="Gas")
+    if(fOneStepPrimaries&&thePrePV->GetName()=="GasVolume")
       theTrack->SetTrackStatus(fStopAndKill);
   }
 
-  if(!thePostPV){//out of world
+  if(!thePostPV){ //out of world
     return;
   }
 
-  //  G4ParticleDefinition* particleType = theTrack->GetDefinition();
-  //  if(particleType==G4OpticalPhoton::OpticalPhotonDefinition()){
-  //    //Optical photon only
-  //
-  //    if(thePrePV->GetName()=="Slab")
-  //      //force drawing of photons in WLS slab
-  //      trackInformation->SetForceDrawTrajectory(true);
-  //    else if(thePostPV->GetName()=="expHall")
-  //      //Kill photons entering expHall from something other than Slab
-  //      theTrack->SetTrackStatus(fStopAndKill);
-  //
-  //    //Was the photon absorbed by the absorption process
-  //    if(thePostPoint->GetProcessDefinedStep()->GetProcessName()
-  //       =="OpAbsorption"){
-  //      eventInformation->IncAbsorption();
-  //      trackInformation->AddTrackStatusFlag(absorbed);
-  //    }
-  //
-  //    boundaryStatus=boundary->GetStatus();
-  //
-  //    //Check to see if the partcile was actually at a boundary
-  //    //Otherwise the boundary status may not be valid
-  //    //Prior to Geant4.6.0-p1 this would not have been enough to check
-  //    if(thePostPoint->GetStepStatus()==fGeomBoundary){
-  //      if(fExpectedNextStatus==StepTooSmall){
-  //        if(boundaryStatus!=StepTooSmall){
-  //          G4ExceptionDescription ed;
-  //          ed << "EicRichGemTbSteppingAction::UserSteppingAction(): "
-  //             << "No reallocation step after reflection!"
-  //             << G4endl;
-  //          G4Exception("EicRichGemTbSteppingAction::UserSteppingAction()", "EicRichGemTbExpl01",
-  //                      FatalException,ed,
-  //                      "Something is wrong with the surface normal or geometry");
-  //        }
-  //      }
-  //      fExpectedNextStatus=Undefined;
-  //      switch(boundaryStatus){
-  //      case Absorption:
-  //        trackInformation->AddTrackStatusFlag(boundaryAbsorbed);
-  //        eventInformation->IncBoundaryAbsorption();
-  //        break;
-  //      case Detection: //Note, this assumes that the volume causing detection
-  //                      //is the photocathode because it is the only one with
-  //                      //non-zero efficiency
-  //        {
-  //          //Triger sensitive detector manually since photon is
-  //          //absorbed but status was Detection
-  //          G4SDManager* SDman = G4SDManager::GetSDMpointer();
-  //          G4String sdName="/EicRichGemTbDet/pmtSD";
-  //          EicRichGemTbPMTSD* pmtSD = (EicRichGemTbPMTSD*)SDman->FindSensitiveDetector(sdName);
-  //          if(pmtSD)pmtSD->ProcessHits_constStep(theStep,NULL);
-  //          trackInformation->AddTrackStatusFlag(hitPMT);
-  //          break;
-  //        }
-  //      case FresnelReflection:
-  //      case TotalInternalReflection:
-  //      case LambertianReflection:
-  //      case LobeReflection:
-  //      case SpikeReflection:
-  //      case BackScattering:
-  //        trackInformation->IncReflections();
-  //        fExpectedNextStatus=StepTooSmall;
-  //        break;
-  //      default:
-  //        break;
-  //      }
-  //      if(thePostPV->GetName()=="sphere")
-  //        trackInformation->AddTrackStatusFlag(hitSphere);
-  //    }
-  //  }
-  //
-  //  if(fRecorder)fRecorder->RecordStep(theStep);
+  G4ParticleDefinition* particleType = theTrack->GetDefinition();
+  if(particleType==G4OpticalPhoton::OpticalPhotonDefinition()){
+    //Optical photon only
+
+    // Was the photon absorbed by the absorption process
+    if(thePostPoint->GetProcessDefinedStep()->GetProcessName() == "OpAbsorption"){
+      G4cout << "Photon absorbed!" << G4endl;
+      //eventInformation->IncAbsorption();
+      //trackInformation->AddTrackStatusFlag(absorbed);
+    }
+
+    boundaryStatus=boundary->GetStatus();
+
+    //Check to see if the partcile was actually at a boundary
+    //Otherwise the boundary status may not be valid
+    //Prior to Geant4.6.0-p1 this would not have been enough to check
+    if(thePostPoint->GetStepStatus()==fGeomBoundary){
+      if(fExpectedNextStatus==StepTooSmall){
+        if(boundaryStatus!=StepTooSmall){
+          G4ExceptionDescription ed;
+          ed << "EicRichGemTbSteppingAction::UserSteppingAction(): "
+             << "No reallocation step after reflection!"
+             << G4endl;
+          G4Exception("EicRichGemTbSteppingAction::UserSteppingAction()", "EicRichGemTbExpl01",
+                      FatalException,ed,
+                      "Something is wrong with the surface normal or geometry");
+        }
+      }
+      fExpectedNextStatus=Undefined;
+      switch(boundaryStatus){
+      case Absorption:
+        //trackInformation->AddTrackStatusFlag(boundaryAbsorbed);
+        //eventInformation->IncBoundaryAbsorption();
+        break;
+      case Detection: //Note, this assumes that the volume causing detection
+                      //is the photocathode because it is the only one with
+                      //non-zero efficiency
+        {
+	  // make sure the photon actually did hit the GEM stack
+	  // G4cout << thePostPV->GetName() << G4endl;
+	  if ( thePostPV->GetName() == "GEMStack" )
+	    {
+	      //Triger sensitive detector manually since photon is
+	      //absorbed but status was Detection
+	      G4SDManager* SDman = G4SDManager::GetSDMpointer();
+	      G4String sdName="/EicRichGemTbDet/photoSD";
+	      EicRichGemTbSD* photoSD = (EicRichGemTbSD*)SDman->FindSensitiveDetector(sdName);
+	      if(photoSD) photoSD->ProcessHits_constStep(theStep,NULL);
+	      //trackInformation->AddTrackStatusFlag(hitPMT);
+	    }
+          break;
+        }
+      case FresnelReflection:
+      case TotalInternalReflection:
+      case LambertianReflection:
+      case LobeReflection:
+      case SpikeReflection:
+      case BackScattering:
+        //trackInformation->IncReflections();
+        fExpectedNextStatus=StepTooSmall;
+        break;
+      default:
+        break;
+      }
+      //if(thePostPV->GetName()=="sphere")
+      //trackInformation->AddTrackStatusFlag(hitSphere);
+    }
+  }
+
+  //if(fRecorder)fRecorder->RecordStep(theStep);
 }

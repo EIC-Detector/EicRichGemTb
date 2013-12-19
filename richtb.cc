@@ -5,6 +5,7 @@
 #include "EicRichGemTbPrimaryGeneratorAction.hh"
 #include "EicRichGemTbDetectorConstruction.hh"
 #include "EicRichGemTbRunAction.hh"
+#include "EicRichGemTbEventAction.hh"
 #include "EicRichGemTbStackingAction.hh"
 #include "EicRichGemTbSteppingVerbose.hh"
 #include "EicRichGemTbSteppingAction.hh"
@@ -51,6 +52,9 @@ int main(int argc,char** argv)
   //
   runManager->SetUserAction(new EicRichGemTbSteppingAction());
 
+  // configure run manager
+  //  runManager->SetNumberOfEventsToBeStored(1);
+
 #ifdef G4VIS_USE
   // visualization manager
   //
@@ -62,6 +66,9 @@ int main(int argc,char** argv)
   //
   G4UserRunAction* run_action = new EicRichGemTbRunAction;
   runManager->SetUserAction(run_action);
+  //
+  G4UserEventAction* event_action = new EicRichGemTbEventAction;
+  runManager->SetUserAction(event_action);
   //
   G4UserStackingAction* stacking_action = new EicRichGemTbStackingAction;
   runManager->SetUserAction(stacking_action);

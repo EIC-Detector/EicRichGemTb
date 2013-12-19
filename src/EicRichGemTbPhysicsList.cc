@@ -225,9 +225,9 @@ void EicRichGemTbPhysicsList::ConstructOp()
   theMieHGScatteringProcess    = new G4OpMieHG();
   theBoundaryProcess           = new G4OpBoundaryProcess();
 
-//  theCerenkovProcess->DumpPhysicsTable();
-//  theScintillationProcess->DumpPhysicsTable();
-//  theRayleighScatteringProcess->DumpPhysicsTable();
+  //  theCerenkovProcess->DumpPhysicsTable();
+  //  theScintillationProcess->DumpPhysicsTable();
+  //  theRayleighScatteringProcess->DumpPhysicsTable();
 
   SetVerbose(0);
 

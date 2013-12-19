@@ -155,9 +155,8 @@ G4bool EicRichGemTbSD::ProcessHits_constStep(const G4Step* aStep, G4TouchableHis
 void  EicRichGemTbSD::EndOfEvent(G4HCofThisEvent*HCE){
   if( HCID < 0 ){
     HCID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]); }
-  HCE->AddHitsCollection( HCID, PhotoHitCollection );
 
-  PhotoHitCollection->PrintAllHits();
+  HCE->AddHitsCollection( HCID, PhotoHitCollection );
 
 }
 

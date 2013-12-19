@@ -16,6 +16,7 @@ class EicRichGemTbUserEventInformation : public G4VUserEventInformation
 
     inline virtual void Print()const{};
 
+    void IncEventCount(){fEventCount++;}
     void IncPhotonCount_Scint(){fPhotonCount_Scint++;}
     void IncPhotonCount_Ceren(){fPhotonCount_Ceren++;}
     void IncEDep(G4double dep){fTotE+=dep;}
@@ -49,6 +50,8 @@ class EicRichGemTbUserEventInformation : public G4VUserEventInformation
     G4int GetPMTSAboveThreshold(){return fPMTsAboveThreshold;}
 
   private:
+
+    G4int fEventCount;
 
     G4int fHitCount;
     G4int fPhotonCount_Scint;

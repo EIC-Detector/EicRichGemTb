@@ -32,7 +32,7 @@ void EicRichGemTbGeometry::SetDefault(){
 
   gemstack_x = 10.0 * cm;
   gemstack_y = 10.0 * cm;
-  gemstack_z =  5.0 * cm;
+  gemstack_z =  2.0 * cm;
   gemstack_pos_z = - 0.5 * ( GetPressureVesselLength() - GetGEMStackZ() ) ;
 
   return;

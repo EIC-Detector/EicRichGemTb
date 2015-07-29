@@ -2,7 +2,7 @@
 #include <cmath>
 
 #include "globals.hh"
-//
+
 #include "EicRichGemTbMaterial.hh"
 
 #include "G4Isotope.hh"

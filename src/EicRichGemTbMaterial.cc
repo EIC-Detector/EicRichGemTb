@@ -22,7 +22,6 @@
 //#include "EicRichGemTbMaterialParameters.hh"
 //#include "EicRichGemTbGeometryParameters.hh"
 
-
 EicRichGemTbMaterial::EicRichGemTbMaterial(){
 
   G4double a; //atomic mass
@@ -58,12 +57,6 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   I  = manager->FindOrBuildElement(53);
   Cs = manager->FindOrBuildElement(55);
 
-  //Ge = manager->FindOrBuildElement(32);
-  //Sb = manager->FindOrBuildElement(51);
-  //Pb = manager->FindOrBuildElement(82);
-  //Bi = manager->FindOrBuildElement(83);
-
-
   //Vacuum
   //
   density=universe_mean_density;
@@ -97,7 +90,6 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
 
   CF4->AddElement(C, 1);
   CF4->AddElement(F, 4);
-
 
   // CsI
   //
@@ -184,24 +176,41 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   //
   const G4int cf4_nEntries = 32;
 
-  G4double cf4_PhotonEnergy[cf4_nEntries]    =
-    { 2.034*eV, 2.068*eV, 2.103*eV, 2.139*eV,
-      2.177*eV, 2.216*eV, 2.256*eV, 2.298*eV,
-      2.341*eV, 2.386*eV, 2.433*eV, 2.481*eV,
-      2.532*eV, 2.585*eV, 2.640*eV, 2.697*eV,
-      2.757*eV, 2.820*eV, 2.885*eV, 2.954*eV,
-      3.026*eV, 3.102*eV, 3.181*eV, 3.265*eV,
-      3.353*eV, 3.446*eV, 3.545*eV, 3.649*eV,
-      3.760*eV, 3.877*eV, 4.002*eV, 4.136*eV };
+  // Photon wavelengths 120 - 200 nm
+  //
 
-  //  G4double cf4_RefractiveIndex[cf4_nEntries]  =
-  //    { 1.3435, 1.344,  1.3445, 1.345,  1.3455,
-  //      1.346,  1.3465, 1.347,  1.3475, 1.348,
-  //      1.3485, 1.3492, 1.35,   1.3505, 1.351,
-  //      1.3518, 1.3522, 1.3530, 1.3535, 1.354,
-  //      1.3545, 1.355,  1.3555, 1.356,  1.3568,
-  //      1.3572, 1.358,  1.3585, 1.359,  1.3595,
-  //      1.36,   1.3608};
+  G4double cf4_PhotonWavelength[cf4_nEntries]  =
+    {200.000000000000*nm, 197.419354838710*nm, 194.838709677419*nm, 192.258064516129*nm,
+     189.677419354839*nm, 187.096774193548*nm, 184.516129032258*nm, 181.935483870968*nm,
+     179.354838709677*nm, 176.774193548387*nm, 174.193548387097*nm, 171.612903225807*nm,
+     169.032258064516*nm, 166.451612903226*nm, 163.870967741936*nm, 161.290322580645*nm,
+     158.709677419355*nm, 156.129032258065*nm, 153.548387096774*nm, 150.967741935484*nm,
+     148.387096774194*nm, 145.806451612903*nm, 143.225806451613*nm, 140.645161290323*nm,
+     138.064516129032*nm, 135.483870967742*nm, 132.903225806452*nm, 130.322580645161*nm,
+     127.741935483871*nm, 125.161290322581*nm, 122.580645161290*nm, 120.000000000000*nm};
+
+  // Photon energies
+  //
+
+  G4double* cf4_PhotonEnergy = new G4double[cf4_nEntries];
+  G4int i;
+  for(i=0;i<cf4_nEntries;i++)
+    {
+      cf4_PhotonEnergy[i] = 1.23984193*eV*1000*nm/cf4_PhotonWavelength[i];
+    }
+
+  //Refractive Index of CF4
+  //
+
+ G4double cf4_RefractiveIndex[cf4_nEntries]  =
+   {1.00052729574769, 1.00052876876669, 1.00053030945866, 1.00053192216804,
+    1.00053361160381, 1.00053538287781, 1.00053724154787, 1.00053919366665,
+    1.00054124583687, 1.00054340527413, 1.00054567987839, 1.00054807831564,
+    1.00055061011147, 1.00055328575860, 1.00055611684072, 1.00055911617590,
+    1.00056229798296, 1.00056567807526, 1.00056927408754, 1.00057310574219,
+    1.00057719516344, 1.00058156724978, 1.00058625011743, 1.00059127563130,
+    1.00059668004417, 1.00060250477064, 1.00060879733031, 1.00061561250462,
+    1.00062301376631, 1.00063107505917, 1.00063988303241, 1.00064953987108};
 
   G4double cf4_Absorption[cf4_nEntries]  =
     {3.448*m,  4.082*m,  6.329*m,  9.174*m, 12.346*m, 13.889*m,
@@ -226,14 +235,6 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   //      7.00, 6.00, 5.00, 4.00 };
 
   // use const refractive index from Thom's presentation
-  G4double cf4_RefractiveIndex[cf4_nEntries]  =
-    { 1.00054, 1.00054, 1.00054, 1.00054, 1.00054,
-      1.00054, 1.00054, 1.00054, 1.00054, 1.00054,
-      1.00054, 1.00054, 1.00054, 1.00054, 1.00054,
-      1.00054, 1.00054, 1.00054, 1.00054, 1.00054,
-      1.00054, 1.00054, 1.00054, 1.00054, 1.00054,
-      1.00054, 1.00054, 1.00054, 1.00054, 1.00054,
-      1.00054, 1.00054};
 
   G4MaterialPropertiesTable* fMPT_cf4 = new G4MaterialPropertiesTable();
 

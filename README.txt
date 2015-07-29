@@ -12,7 +12,7 @@ Installation
 
 Getting the code from GitHub
 
-git clone https://github.com/nfeege/EicRichGemTb.git
+git clone https://github.com/rbruce11/EicRichGemTb.git
 
 
 --------------------------------------------------------------------------------

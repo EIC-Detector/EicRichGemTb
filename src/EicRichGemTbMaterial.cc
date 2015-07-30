@@ -323,25 +323,13 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
     { // test from G4 example
       const G4int NUM = 32;
       
-      // Photon wavelengths 120 - 200 nm
-      //
-      G4double mirror_PhotonWavelength[NUM] =
-	{200.000000000000*nm, 197.419354838710*nm, 194.838709677419*nm, 192.258064516129*nm,
-	 189.677419354839*nm, 187.096774193548*nm, 184.516129032258*nm, 181.935483870968*nm,
-	 179.354838709677*nm, 176.774193548387*nm, 174.193548387097*nm, 171.612903225807*nm,
-	 169.032258064516*nm, 166.451612903226*nm, 163.870967741936*nm, 161.290322580645*nm,
-	 158.709677419355*nm, 156.129032258065*nm, 153.548387096774*nm, 150.967741935484*nm,
-	 148.387096774194*nm, 145.806451612903*nm, 143.225806451613*nm, 140.645161290323*nm,
-	 138.064516129032*nm, 135.483870967742*nm, 132.903225806452*nm, 130.322580645161*nm,
-	 127.741935483871*nm, 125.161290322581*nm, 122.580645161290*nm, 120.000000000000*nm};
-
       // Photon energies
       //
       G4double* pp = new G4double[NUM];
       G4int i;
       for(i = 0; i < NUM; i++)
 	{
-	  pp[i] = 1.23984193*eV*1000*nm/mirror_PhotonWavelength[i];
+	  pp[i] = cf4_PhotonEnergy[i];
 	}
 
       //G4double specularlobe[NUM] = {0.3, 0.3};
@@ -359,7 +347,7 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
 	 1.4, 1.4, 1.4, 1.4};
 
       G4double reflectivity[NUM] = 
-	/*{0.801070, 0.820321, 0.826738, 0.824599,
+	{0.801070, 0.820321, 0.826738, 0.824599,
 	 0.817112, 0.807487, 0.794652, 0.783957,
 	 0.776471, 0.768984, 0.767914, 0.768984,
 	 0.766845, 0.762567, 0.759358, 0.757219,
@@ -367,16 +355,7 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
 	 0.775401, 0.782888, 0.787166, 0.789305,
 	 0.789305, 0.793583, 0.800000, 0.805348,
 	 0.809626, 0.814973, 0.823529, 0.831016};
-	*/
-	{1.0, 1.0, 1.0, 1.0,
-	 1.0, 1.0, 1.0, 1.0,
-	 1.0, 1.0, 1.0, 1.0,
-	 1.0, 1.0, 1.0, 1.0,
-	 1.0, 1.0, 1.0, 1.0,
-	 1.0, 1.0, 1.0, 1.0,
-	 1.0, 1.0, 1.0, 1.0,
-	 1.0, 1.0, 1.0, 1.0};
-
+	
       G4double efficiency[NUM] = 
 	{0.0, 0.0, 0.0, 0.0,
 	 0.0, 0.0, 0.0, 0.0,
@@ -409,10 +388,30 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   //
   OpticalPhotocathodeSurface = new G4OpticalSurface("OpticalPhotocathodeSurface", glisur, polished, dielectric_metal);
 
-  G4double photocath_EPHOTON[2]={1.,1000.};
-  G4double photocath_EFF[2]={1.,1.};
-  G4double photocath_REFL[2]={0.,0.};
-
+  const G4int n = 32;
+  G4double* photocath_EPHOTON = new G4double[n];  
+  for(i = 0; i < n; i++)
+    {
+      photocath_EPHOTON[i] = cf4_PhotonEnergy[i];
+    }
+  G4double photocath_EFF[n] =
+    {0.654219, 0.630591, 0.609916, 0.587764, 
+     0.567089, 0.546414, 0.524262, 0.503586, 
+     0.482911, 0.462236, 0.438608, 0.420886, 
+     0.398734, 0.376582, 0.355907, 0.335232, 
+     0.314557, 0.293882, 0.271730, 0.251055, 
+     0.230380, 0.208228, 0.187553, 0.168354, 
+     0.144726, 0.125527, 0.103376, 0.082700, 
+     0.062025, 0.039873, 0.017721, 0.000000};
+  G4double photocath_REFL[n] = 
+    {0.,0.,0.,0.,
+     0.,0.,0.,0.,
+     0.,0.,0.,0.,
+     0.,0.,0.,0.,
+     0.,0.,0.,0.,
+     0.,0.,0.,0.,
+     0.,0.,0.,0.,
+     0.,0.,0.,0.};
   G4MaterialPropertiesTable* OpticalPhotocathodeSurface_MPT = new G4MaterialPropertiesTable();
   OpticalPhotocathodeSurface_MPT->AddProperty("EFFICIENCY",photocath_EPHOTON,photocath_EFF,2);
   OpticalPhotocathodeSurface_MPT->AddProperty("REFLECTIVITY",photocath_EPHOTON,photocath_REFL,2);

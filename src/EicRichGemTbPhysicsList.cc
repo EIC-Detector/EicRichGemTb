@@ -217,7 +217,7 @@ void EicRichGemTbPhysicsList::ConstructEM()
 
 void EicRichGemTbPhysicsList::ConstructOp()
 {
-  G4cout << "Start CHERNEKOV Physics" << G4endl;
+  G4cout << "Start CERENKOV Physics" << G4endl;
   theCerenkovProcess           = new G4Cerenkov("Cerenkov");
   theScintillationProcess      = new G4Scintillation("Scintillation");
   theAbsorptionProcess         = new G4OpAbsorption();

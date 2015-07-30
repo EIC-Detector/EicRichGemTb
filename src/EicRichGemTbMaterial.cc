@@ -413,8 +413,8 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
      0.,0.,0.,0.,
      0.,0.,0.,0.};
   G4MaterialPropertiesTable* OpticalPhotocathodeSurface_MPT = new G4MaterialPropertiesTable();
-  OpticalPhotocathodeSurface_MPT->AddProperty("EFFICIENCY",photocath_EPHOTON,photocath_EFF,2);
-  OpticalPhotocathodeSurface_MPT->AddProperty("REFLECTIVITY",photocath_EPHOTON,photocath_REFL,2);
+  OpticalPhotocathodeSurface_MPT->AddProperty("EFFICIENCY",photocath_EPHOTON,photocath_EFF,32);
+  OpticalPhotocathodeSurface_MPT->AddProperty("REFLECTIVITY",photocath_EPHOTON,photocath_REFL,32);
   OpticalPhotocathodeSurface->SetMaterialPropertiesTable(OpticalPhotocathodeSurface_MPT);
 
   // done

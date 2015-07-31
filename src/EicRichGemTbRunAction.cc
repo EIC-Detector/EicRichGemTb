@@ -67,7 +67,7 @@ void EicRichGemTbRunAction::EndOfRunAction(const G4Run* aRun)
 {
   timer->Stop();
   G4int nofEvents = aRun->GetNumberOfEvent();
-  G4cout << "number of event = " << nofEvents << " " << *timer << G4endl;
+  G4cout << "Event number = " << nofEvents << " " << *timer << G4endl;
 
   //  if ( nofEvents == 0 ) return;
 

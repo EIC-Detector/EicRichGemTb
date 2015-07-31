@@ -26,7 +26,7 @@ EicRichGemTbStackingAction::ClassifyNewTrack(const G4Track * aTrack)
     if(aTrack->GetParentID()>0)
     { // particle is secondary
       gammaCounter++;
-      if(aTrack->GetKineticEnergy()>0)
+      if(gammaCounter%50==0&&aTrack->GetKineticEnergy()>0)
 	G4cout<<"Photon Energy = "<<aTrack->GetKineticEnergy()<<G4endl;
     }
   }

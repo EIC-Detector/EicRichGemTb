@@ -43,6 +43,7 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   O  = manager->FindOrBuildElement(8);
   C  = manager->FindOrBuildElement(6);
   F  = manager->FindOrBuildElement(9);
+  Mg = manager->FindOrBuildElement(12);
   Si = manager->FindOrBuildElement(14);
   Ar = manager->FindOrBuildElement(18);
   I  = manager->FindOrBuildElement(53);
@@ -93,6 +94,12 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   //
   Aluminum = new G4Material("Aluminum", z=13 , a=26.98*g/mole , density=2.7*g/cm3);
 
+  //MgF2 
+  //
+  MgF2 = new G4Material("MgF2", density = 3.148*g/cm3, nelements = 2);
+  MgF2->AddElement(Mg, natoms = 1);
+  MgF2->AddElement(F, natoms = 2);
+
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 
   //  LHCb
@@ -119,8 +126,9 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   // LHCb: There is a quartz for the mirror and
   // another quartz which is used in aerogel and
   // yet another quartz used for the quartz window.
+  
   // Mirrorquartz
-
+  //
   SiO2MirrorQuartz = new G4Material("MirrorQuartz", density=2.200*g/cm3, nelements=2);
   SiO2MirrorQuartz->AddElement(Si,natoms=1);
   SiO2MirrorQuartz->AddElement(O,natoms=2);

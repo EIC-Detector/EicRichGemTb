@@ -35,6 +35,7 @@ private:
   G4Element* O;
   G4Element* C;
   G4Element* F;
+  G4Element* Mg;
   G4Element* Si;
   G4Element* Ar;
   G4Element* I;
@@ -48,6 +49,7 @@ private:
   G4Material* CsI;
   G4Material* StainlessSteel;
   G4Material* Aluminum;
+  G4Material* MgF2;
   G4Material* SiO2MirrorQuartz;
 
   G4OpticalSurface* OpticalMirrorSurface;

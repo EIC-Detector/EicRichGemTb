@@ -36,10 +36,13 @@ private:
   G4Element* C;
   G4Element* F;
   G4Element* Si;
+  G4Element* Ar;
   G4Element* I;
   G4Element* Cs;
 
+
   G4Material* Vacuum;
+  G4Material* CO2;
   G4Material* AmbientAir;
   G4Material* CF4;
   G4Material* CsI;

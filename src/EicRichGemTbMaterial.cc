@@ -33,32 +33,22 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   G4int nelements;
   G4int natoms;
 
-  //  // Elements
-  //  //
-  //  H  = new G4Element("Hydrogen", "H", z=1 , a=1.01*g/mole);
-  //  N  = new G4Element("Nitrogen", "N", z=7 , a=14.01*g/mole);
-  //  O  = new G4Element("Oxygen"  , "O", z=8 , a=16.00*g/mole);
-  //  C  = new G4Element("Carbon", "C", z=6 , a=12.01*g/mole);
-  //  F  = new G4Element("Fluorine", "F", z=9 , a=19.00*g/mole);
-
   // G4 database on G4Elements
   G4NistManager* manager = G4NistManager::Instance();
   manager->SetVerbose(0);
-  //
-  // define Elements
-  //
 
+  // Define Elements
   H  = manager->FindOrBuildElement(1);
   N  = manager->FindOrBuildElement(7);
   O  = manager->FindOrBuildElement(8);
   C  = manager->FindOrBuildElement(6);
   F  = manager->FindOrBuildElement(9);
   Si = manager->FindOrBuildElement(14);
+  Ar = manager->FindOrBuildElement(18);
   I  = manager->FindOrBuildElement(53);
   Cs = manager->FindOrBuildElement(55);
 
   //Vacuum
-  //
   density=universe_mean_density;
   a=1.01*g/mole;
   pressure=1.e-19*pascal;
@@ -68,26 +58,20 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   Vacuum->AddElement(H,natoms=1);
 
   // Air
-  //
-  AmbientAir = new G4Material("Air", density=1.29*mg/cm3, nelements=2);
-  AmbientAir->AddElement(N, 70.*perCent);
-  AmbientAir->AddElement(O, 30.*perCent);
+  CO2 = new G4Material("C02", density = 1.977*kg/m3, nelements = 2);
+  CO2->AddElement(C, natoms = 1);
+  CO2->AddElement(O, natoms = 2);
+
+  AmbientAir = new G4Material("Air", density = 1.293*mg/cm3, nelements=4);
+  AmbientAir->AddElement(N, 75.53*perCent);
+  AmbientAir->AddElement(O, 23.14*perCent);
+  AmbientAir->AddElement(Ar, 1.29*perCent);
+  AmbientAir->AddMaterial(CO2, 0.04*perCent);
 
   // CF4
   //
 
-  // LHCb; no data available at room temp and pressure;
-  CF4 = new G4Material("CF4", density=0.003884*g/cm3, nelements=2, kStateGas, temperature=273.*kelvin, pressure=1.0*atmosphere);
-
-  // http://www.slac.stanford.edu/pubs/icfa/summer98/paper3/paper3.pdf : density=0.00393*g/cm^3, T = 20degC
-
-  // http://encyclopedia.airliquide.com/Encyclopedia.asp?GasID=61#GeneralData :
-  // Molecular weight  : 88.01 g/mol
-  // Gas density (1.013 bar and 15 °C (59 °F)) : 3.72 kg/m3
-
-  // example
-  //fCF4 = new G4Material("CF4", density=3.72*g/cm3, nelements=2);
-
+  CF4 = new G4Material("CF4", density=0.003884*g/cm3, nelements = 2, kStateGas);
   CF4->AddElement(C, 1);
   CF4->AddElement(F, 4);
 

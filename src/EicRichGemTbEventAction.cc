@@ -59,6 +59,9 @@ void EicRichGemTbEventAction::EndOfEventAction(const G4Event* evt)
   // get analysis manager
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
 
+  // print out total number of photons registered on CsI readout plane
+  G4cout << "Number of optical photons registered on CsI in this event: " << photoHits->GetSize() << G4endl;
+
   // fill ntuple
   for ( G4int ihit = 0; ihit < photoHits->GetSize(); ihit++ )
     {

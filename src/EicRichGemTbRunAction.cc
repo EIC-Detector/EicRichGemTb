@@ -49,6 +49,12 @@ void EicRichGemTbRunAction::BeginOfRunAction(const G4Run* aRun)
   G4String fileName = "simData_EicRichGemTb";
   analysisManager->OpenFile(fileName);
 
+  // Creating histograms
+  //
+  analysisManager->SetFirstHistoId(1);
+  analysisManager->CreateH1("1","Number of photons generated", 301, -0.5, 300.5);
+  analysisManager->CreateH1("2","Number of photons recorded", 301, -0.5, 300.5);
+
   // Creating tree
   //
   analysisManager->CreateNtuple("photoHits", "photon hits on GEM stack");

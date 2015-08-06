@@ -62,6 +62,9 @@ void EicRichGemTbEventAction::EndOfEventAction(const G4Event* evt)
   // print out total number of photons registered on CsI readout plane
   G4cout << "Number of optical photons registered on CsI in this event: " << photoHits->GetSize() << G4endl;
 
+  // Fill histogram with number of photons registered on CsI readout plane
+  analysisManager->FillH1(2, photoHits->GetSize());
+
   // fill ntuple
   for ( G4int ihit = 0; ihit < photoHits->GetSize(); ihit++ )
     {

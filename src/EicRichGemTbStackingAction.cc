@@ -5,6 +5,8 @@
 #include "G4Track.hh"
 #include "G4ios.hh"
 
+#include "EicRichGemTbAnalysis.hh"
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 EicRichGemTbStackingAction::EicRichGemTbStackingAction()
@@ -39,6 +41,9 @@ void EicRichGemTbStackingAction::NewStage()
 {
   G4cout << "Number of optical photons produced in this event : "
          << gammaCounter << G4endl;
+
+  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+  analysisManager->FillH1(1, gammaCounter);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -22,7 +22,6 @@
 //#include "EicRichGemTbMaterialParameters.hh"
 //#include "EicRichGemTbGeometryParameters.hh"
 
-
 EicRichGemTbMaterial::EicRichGemTbMaterial(){
 
   G4double a; //atomic mass
@@ -34,38 +33,23 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   G4int nelements;
   G4int natoms;
 
-  //  // Elements
-  //  //
-  //  H  = new G4Element("Hydrogen", "H", z=1 , a=1.01*g/mole);
-  //  N  = new G4Element("Nitrogen", "N", z=7 , a=14.01*g/mole);
-  //  O  = new G4Element("Oxygen"  , "O", z=8 , a=16.00*g/mole);
-  //  C  = new G4Element("Carbon", "C", z=6 , a=12.01*g/mole);
-  //  F  = new G4Element("Fluorine", "F", z=9 , a=19.00*g/mole);
-
   // G4 database on G4Elements
   G4NistManager* manager = G4NistManager::Instance();
   manager->SetVerbose(0);
-  //
-  // define Elements
-  //
 
+  // Define Elements
   H  = manager->FindOrBuildElement(1);
   N  = manager->FindOrBuildElement(7);
   O  = manager->FindOrBuildElement(8);
   C  = manager->FindOrBuildElement(6);
   F  = manager->FindOrBuildElement(9);
+  Mg = manager->FindOrBuildElement(12);
   Si = manager->FindOrBuildElement(14);
+  Ar = manager->FindOrBuildElement(18);
   I  = manager->FindOrBuildElement(53);
   Cs = manager->FindOrBuildElement(55);
 
-  //Ge = manager->FindOrBuildElement(32);
-  //Sb = manager->FindOrBuildElement(51);
-  //Pb = manager->FindOrBuildElement(82);
-  //Bi = manager->FindOrBuildElement(83);
-
-
   //Vacuum
-  //
   density=universe_mean_density;
   a=1.01*g/mole;
   pressure=1.e-19*pascal;
@@ -75,29 +59,22 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   Vacuum->AddElement(H,natoms=1);
 
   // Air
-  //
-  AmbientAir = new G4Material("Air", density=1.29*mg/cm3, nelements=2);
-  AmbientAir->AddElement(N, 70.*perCent);
-  AmbientAir->AddElement(O, 30.*perCent);
+  CO2 = new G4Material("C02", density = 1.977*kg/m3, nelements = 2);
+  CO2->AddElement(C, natoms = 1);
+  CO2->AddElement(O, natoms = 2);
+
+  AmbientAir = new G4Material("Air", density = 1.293*mg/cm3, nelements=4);
+  AmbientAir->AddElement(N, 75.53*perCent);
+  AmbientAir->AddElement(O, 23.14*perCent);
+  AmbientAir->AddElement(Ar, 1.29*perCent);
+  AmbientAir->AddMaterial(CO2, 0.04*perCent);
 
   // CF4
   //
 
-  // LHCb; no data available at room temp and pressure;
-  CF4 = new G4Material("CF4", density=0.003884*g/cm3, nelements=2, kStateGas, temperature=273.*kelvin, pressure=1.0*atmosphere);
-
-  // http://www.slac.stanford.edu/pubs/icfa/summer98/paper3/paper3.pdf : density=0.00393*g/cm^3, T = 20degC
-
-  // http://encyclopedia.airliquide.com/Encyclopedia.asp?GasID=61#GeneralData :
-  // Molecular weight  : 88.01 g/mol
-  // Gas density (1.013 bar and 15 °C (59 °F)) : 3.72 kg/m3
-
-  // example
-  //fCF4 = new G4Material("CF4", density=3.72*g/cm3, nelements=2);
-
+  CF4 = new G4Material("CF4", density=0.003884*g/cm3, nelements = 2, kStateGas);
   CF4->AddElement(C, 1);
   CF4->AddElement(F, 4);
-
 
   // CsI
   //
@@ -117,6 +94,18 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   //
   Aluminum = new G4Material("Aluminum", z=13 , a=26.98*g/mole , density=2.7*g/cm3);
 
+  // MgF2 
+  //
+  MgF2 = new G4Material("MgF2", density = 3.148*g/cm3, nelements = 2);
+  MgF2->AddElement(Mg, natoms = 1);
+  MgF2->AddElement(F, natoms = 2);
+
+  // Mirror Quartz
+  //
+  SiO2MirrorQuartz = new G4Material("MirrorQuartz", density=2.200*g/cm3, nelements=2);
+  SiO2MirrorQuartz->AddElement(Si,natoms=1);
+  SiO2MirrorQuartz->AddElement(O,natoms=2);
+  
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 
   //  LHCb
@@ -143,12 +132,7 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   // LHCb: There is a quartz for the mirror and
   // another quartz which is used in aerogel and
   // yet another quartz used for the quartz window.
-  // Mirrorquartz
-
-  SiO2MirrorQuartz = new G4Material("MirrorQuartz", density=2.200*g/cm3, nelements=2);
-  SiO2MirrorQuartz->AddElement(Si,natoms=1);
-  SiO2MirrorQuartz->AddElement(O,natoms=2);
-
+  
   G4int NumPhotWaveLengthBins = 2;
 
   G4double MirrorQuartzRindex[2]={1.35,1.35};
@@ -184,129 +168,49 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   //
   const G4int cf4_nEntries = 32;
 
-  G4double cf4_PhotonEnergy[cf4_nEntries]    =
-    { 2.034*eV, 2.068*eV, 2.103*eV, 2.139*eV,
-      2.177*eV, 2.216*eV, 2.256*eV, 2.298*eV,
-      2.341*eV, 2.386*eV, 2.433*eV, 2.481*eV,
-      2.532*eV, 2.585*eV, 2.640*eV, 2.697*eV,
-      2.757*eV, 2.820*eV, 2.885*eV, 2.954*eV,
-      3.026*eV, 3.102*eV, 3.181*eV, 3.265*eV,
-      3.353*eV, 3.446*eV, 3.545*eV, 3.649*eV,
-      3.760*eV, 3.877*eV, 4.002*eV, 4.136*eV };
-
-  //  G4double cf4_RefractiveIndex[cf4_nEntries]  =
-  //    { 1.3435, 1.344,  1.3445, 1.345,  1.3455,
-  //      1.346,  1.3465, 1.347,  1.3475, 1.348,
-  //      1.3485, 1.3492, 1.35,   1.3505, 1.351,
-  //      1.3518, 1.3522, 1.3530, 1.3535, 1.354,
-  //      1.3545, 1.355,  1.3555, 1.356,  1.3568,
-  //      1.3572, 1.358,  1.3585, 1.359,  1.3595,
-  //      1.36,   1.3608};
-
-  G4double cf4_Absorption[cf4_nEntries]  =
-    {3.448*m,  4.082*m,  6.329*m,  9.174*m, 12.346*m, 13.889*m,
-     15.152*m, 17.241*m, 18.868*m, 20.000*m, 26.316*m, 35.714*m,
-     45.455*m, 47.619*m, 52.632*m, 52.632*m, 55.556*m, 52.632*m,
-     52.632*m, 47.619*m, 45.455*m, 41.667*m, 37.037*m, 33.333*m,
-     30.000*m, 28.500*m, 27.000*m, 24.500*m, 22.000*m, 19.500*m,
-     17.500*m, 14.500*m };
-
-  //  G4double cf4_ScintilFast[cf4_nEntries] =
-  //    { 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
-  //      1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
-  //      1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
-  //      1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
-  //      1.00, 1.00, 1.00, 1.00 };
+  // Photon wavelengths 120 - 200 nm
   //
-  //  G4double cf4_ScintilSlow[cf4_nEntries] =
-  //    { 0.01, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00,
-  //      7.00, 8.00, 9.00, 8.00, 7.00, 6.00, 4.00,
-  //      3.00, 2.00, 1.00, 0.01, 1.00, 2.00, 3.00,
-  //      4.00, 5.00, 6.00, 7.00, 8.00, 9.00, 8.00,
-  //      7.00, 6.00, 5.00, 4.00 };
 
-  // use const refractive index from Thom's presentation
-  G4double cf4_RefractiveIndex[cf4_nEntries]  =
-    { 1.00054, 1.00054, 1.00054, 1.00054, 1.00054,
-      1.00054, 1.00054, 1.00054, 1.00054, 1.00054,
-      1.00054, 1.00054, 1.00054, 1.00054, 1.00054,
-      1.00054, 1.00054, 1.00054, 1.00054, 1.00054,
-      1.00054, 1.00054, 1.00054, 1.00054, 1.00054,
-      1.00054, 1.00054, 1.00054, 1.00054, 1.00054,
-      1.00054, 1.00054};
+  G4double cf4_PhotonWavelength[cf4_nEntries]  =
+    {200.000000000000*nm, 197.419354838710*nm, 194.838709677419*nm, 192.258064516129*nm,
+     189.677419354839*nm, 187.096774193548*nm, 184.516129032258*nm, 181.935483870968*nm,
+     179.354838709677*nm, 176.774193548387*nm, 174.193548387097*nm, 171.612903225807*nm,
+     169.032258064516*nm, 166.451612903226*nm, 163.870967741936*nm, 161.290322580645*nm,
+     158.709677419355*nm, 156.129032258065*nm, 153.548387096774*nm, 150.967741935484*nm,
+     148.387096774194*nm, 145.806451612903*nm, 143.225806451613*nm, 140.645161290323*nm,
+     138.064516129032*nm, 135.483870967742*nm, 132.903225806452*nm, 130.322580645161*nm,
+     127.741935483871*nm, 125.161290322581*nm, 122.580645161290*nm, 120.000000000000*nm};
+
+  // Photon energies
+  //
+
+  G4double* cf4_PhotonEnergy = new G4double[cf4_nEntries];
+  G4int i;
+  for(i=0;i<cf4_nEntries;i++)
+    {
+      cf4_PhotonEnergy[i] = 1.23984193*eV*1000*nm/cf4_PhotonWavelength[i];
+    }
+
+  //Refractive Index of CF4
+  //
+
+ G4double cf4_RefractiveIndex[cf4_nEntries]  =
+   {1.00052729574769, 1.00052876876669, 1.00053030945866, 1.00053192216804,
+    1.00053361160381, 1.00053538287781, 1.00053724154787, 1.00053919366665,
+    1.00054124583687, 1.00054340527413, 1.00054567987839, 1.00054807831564,
+    1.00055061011147, 1.00055328575860, 1.00055611684072, 1.00055911617590,
+    1.00056229798296, 1.00056567807526, 1.00056927408754, 1.00057310574219,
+    1.00057719516344, 1.00058156724978, 1.00058625011743, 1.00059127563130,
+    1.00059668004417, 1.00060250477064, 1.00060879733031, 1.00061561250462,
+    1.00062301376631, 1.00063107505917, 1.00063988303241, 1.00064953987108};
 
   G4MaterialPropertiesTable* fMPT_cf4 = new G4MaterialPropertiesTable();
 
-  fMPT_cf4->AddProperty("RINDEX",        cf4_PhotonEnergy, cf4_RefractiveIndex, cf4_nEntries )->SetSpline(true);
-  fMPT_cf4->AddProperty("ABSLENGTH",     cf4_PhotonEnergy, cf4_Absorption,      cf4_nEntries )->SetSpline(true);
-  //  fMPT_cf4->AddProperty("FASTCOMPONENT", cf4_PhotonEnergy, cf4_ScintilFast,     cf4_nEntries )->SetSpline(true);
-  //  fMPT_cf4->AddProperty("SLOWCOMPONENT", cf4_PhotonEnergy, cf4_ScintilSlow,     cf4_nEntries )->SetSpline(true);
+  fMPT_cf4->AddProperty("RINDEX", cf4_PhotonEnergy, cf4_RefractiveIndex, cf4_nEntries )->SetSpline(true);
 
   fMPT_cf4->AddConstProperty("SCINTILLATIONYIELD",50./MeV);
-  //  fMPT_cf4->AddConstProperty("RESOLUTIONSCALE",1.0);
-  //  fMPT_cf4->AddConstProperty("FASTTIMECONSTANT", 1.*ns);
-  //  fMPT_cf4->AddConstProperty("SLOWTIMECONSTANT",10.*ns);
-  //  fMPT_cf4->AddConstProperty("YIELDRATIO",0.8);
-
-  //   const G4int NUMENTRIES_cf4 = 60;
-  //
-  //   G4double ENERGY_cf4[NUMENTRIES_cf4] = {
-  //     1.56962*eV, 1.58974*eV, 1.61039*eV, 1.63157*eV,
-  //     1.65333*eV, 1.67567*eV, 1.69863*eV, 1.72222*eV,
-  //     1.74647*eV, 1.77142*eV, 1.7971 *eV, 1.82352*eV,
-  //     1.85074*eV, 1.87878*eV, 1.90769*eV, 1.93749*eV,
-  //     1.96825*eV, 1.99999*eV, 2.03278*eV, 2.06666*eV,
-  //     2.10169*eV, 2.13793*eV, 2.17543*eV, 2.21428*eV,
-  //     2.25454*eV, 2.29629*eV, 2.33962*eV, 2.38461*eV,
-  //     2.43137*eV, 2.47999*eV, 2.53061*eV, 2.58333*eV,
-  //     2.63829*eV, 2.69565*eV, 2.75555*eV, 2.81817*eV,
-  //     2.88371*eV, 2.95237*eV, 3.02438*eV, 3.09999*eV,
-  //     3.17948*eV, 3.26315*eV, 3.35134*eV, 3.44444*eV,
-  //     3.54285*eV, 3.64705*eV, 3.75757*eV, 3.87499*eV,
-  //     3.99999*eV, 4.13332*eV, 4.27585*eV, 4.42856*eV,
-  //     4.59258*eV, 4.76922*eV, 4.95999*eV, 5.16665*eV,
-  //     5.39129*eV, 5.63635*eV, 5.90475*eV, 6.19998*eV
-  //   };
-  //
-  //   //assume 100 times larger than the rayleigh scattering for now.
-  //   G4double MIE_cf4[NUMENTRIES_cf4] = {
-  //     167024.4*m, 158726.7*m, 150742  *m,
-  //     143062.5*m, 135680.2*m, 128587.4*m,
-  //     121776.3*m, 115239.5*m, 108969.5*m,
-  //     102958.8*m, 97200.35*m, 91686.86*m,
-  //     86411.33*m, 81366.79*m, 76546.42*m,
-  //     71943.46*m, 67551.29*m, 63363.36*m,
-  //     59373.25*m, 55574.61*m, 51961.24*m,
-  //     48527.00*m, 45265.87*m, 42171.94*m,
-  //     39239.39*m, 36462.50*m, 33835.68*m,
-  //     31353.41*m, 29010.30*m, 26801.03*m,
-  //     24720.42*m, 22763.36*m, 20924.88*m,
-  //     19200.07*m, 17584.16*m, 16072.45*m,
-  //     14660.38*m, 13343.46*m, 12117.33*m,
-  //     10977.70*m, 9920.416*m, 8941.407*m,
-  //     8036.711*m, 7202.470*m, 6434.927*m,
-  //     5730.429*m, 5085.425*m, 4496.467*m,
-  //     3960.210*m, 3473.413*m, 3032.937*m,
-  //     2635.746*m, 2278.907*m, 1959.588*m,
-  //     1675.064*m, 1422.710*m, 1200.004*m,
-  //     1004.528*m, 833.9666*m, 686.1063*m
-  //   };
-  //
-  //   // gforward, gbackward, forward backward ratio
-  //   G4double MIE_cf4_const[3]={0.99,0.99,0.8};
-  //
-  //   fMPT_cf4->AddProperty("MIEHG",ENERGY_cf4,MIE_cf4,NUMENTRIES_cf4)
-  //     ->SetSpline(true);
-  //   fMPT_cf4->AddConstProperty("MIEHG_FORWARD",MIE_cf4_const[0]);
-  //   fMPT_cf4->AddConstProperty("MIEHG_BACKWARD",MIE_cf4_const[1]);
-  //   fMPT_cf4->AddConstProperty("MIEHG_FORWARD_RATIO",MIE_cf4_const[2]);
 
   CF4->SetMaterialPropertiesTable(fMPT_cf4);
-
-  // Set the Birks Constant for the Cf4 scintillator
-  //fCF4->GetIonisation()->SetBirksConstant(0.126*mm/MeV);
-
-
 
   // Now for the material properties of Surfaces
   //
@@ -409,16 +313,50 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
 
   else if ( mirrortype == "G4example" )
     { // test from G4 example
-      const G4int NUM = 2;
+      const G4int NUM = 32;
+      
+      // Photon energies
+      //
+      G4double* pp = new G4double[NUM];
+      G4int i;
+      for(i = 0; i < NUM; i++)
+	{
+	  pp[i] = cf4_PhotonEnergy[i];
+	}
 
-      G4double pp[NUM] = {2.038*eV, 4.144*eV};
       //G4double specularlobe[NUM] = {0.3, 0.3};
       //G4double specularspike[NUM] = {0.2, 0.2};
       //G4double backscatter[NUM] = {0.1, 0.1};
       //G4double rindex[NUM] = {1.35, 1.40};
-      G4double rindex[NUM] = {1.4, 1.4};
-      G4double reflectivity[NUM] = {1.0, 1.0};
-      G4double efficiency[NUM] = {0.0, 0.0};
+      G4double rindex[NUM] = 
+	{1.4, 1.4, 1.4, 1.4,
+	 1.4, 1.4, 1.4, 1.4,
+	 1.4, 1.4, 1.4, 1.4,
+	 1.4, 1.4, 1.4, 1.4,
+	 1.4, 1.4, 1.4, 1.4,
+	 1.4, 1.4, 1.4, 1.4,
+	 1.4, 1.4, 1.4, 1.4,
+	 1.4, 1.4, 1.4, 1.4};
+
+      G4double reflectivity[NUM] = 
+	{0.801070, 0.820321, 0.826738, 0.824599,
+	 0.817112, 0.807487, 0.794652, 0.783957,
+	 0.776471, 0.768984, 0.767914, 0.768984,
+	 0.766845, 0.762567, 0.759358, 0.757219,
+	 0.757219, 0.758289, 0.762567, 0.766845,
+	 0.775401, 0.782888, 0.787166, 0.789305,
+	 0.789305, 0.793583, 0.800000, 0.805348,
+	 0.809626, 0.814973, 0.823529, 0.831016};
+	
+      G4double efficiency[NUM] = 
+	{0.0, 0.0, 0.0, 0.0,
+	 0.0, 0.0, 0.0, 0.0,
+	 0.0, 0.0, 0.0, 0.0,
+	 0.0, 0.0, 0.0, 0.0,
+	 0.0, 0.0, 0.0, 0.0,
+	 0.0, 0.0, 0.0, 0.0,
+	 0.0, 0.0, 0.0, 0.0,
+	 0.0, 0.0, 0.0, 0.0};
 
       G4MaterialPropertiesTable* SMPT = new G4MaterialPropertiesTable();
 
@@ -442,13 +380,33 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
   //
   OpticalPhotocathodeSurface = new G4OpticalSurface("OpticalPhotocathodeSurface", glisur, polished, dielectric_metal);
 
-  G4double photocath_EPHOTON[2]={1.,1000.};
-  G4double photocath_EFF[2]={1.,1.};
-  G4double photocath_REFL[2]={0.,0.};
-
+  const G4int n = 32;
+  G4double* photocath_EPHOTON = new G4double[n];  
+  for(i = 0; i < n; i++)
+    {
+      photocath_EPHOTON[i] = cf4_PhotonEnergy[i];
+    }
+  G4double photocath_EFF[n] =
+    {0.654219, 0.630591, 0.609916, 0.587764, 
+     0.567089, 0.546414, 0.524262, 0.503586, 
+     0.482911, 0.462236, 0.438608, 0.420886, 
+     0.398734, 0.376582, 0.355907, 0.335232, 
+     0.314557, 0.293882, 0.271730, 0.251055, 
+     0.230380, 0.208228, 0.187553, 0.168354, 
+     0.144726, 0.125527, 0.103376, 0.082700, 
+     0.062025, 0.039873, 0.017721, 0.000000};
+  G4double photocath_REFL[n] = 
+    {0.,0.,0.,0.,
+     0.,0.,0.,0.,
+     0.,0.,0.,0.,
+     0.,0.,0.,0.,
+     0.,0.,0.,0.,
+     0.,0.,0.,0.,
+     0.,0.,0.,0.,
+     0.,0.,0.,0.};
   G4MaterialPropertiesTable* OpticalPhotocathodeSurface_MPT = new G4MaterialPropertiesTable();
-  OpticalPhotocathodeSurface_MPT->AddProperty("EFFICIENCY",photocath_EPHOTON,photocath_EFF,2);
-  OpticalPhotocathodeSurface_MPT->AddProperty("REFLECTIVITY",photocath_EPHOTON,photocath_REFL,2);
+  OpticalPhotocathodeSurface_MPT->AddProperty("EFFICIENCY",photocath_EPHOTON,photocath_EFF,32);
+  OpticalPhotocathodeSurface_MPT->AddProperty("REFLECTIVITY",photocath_EPHOTON,photocath_REFL,32);
   OpticalPhotocathodeSurface->SetMaterialPropertiesTable(OpticalPhotocathodeSurface_MPT);
 
   // done

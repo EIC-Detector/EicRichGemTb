@@ -13,7 +13,7 @@ void EicRichGemTbGeometry::SetDefault(){
   world_y = 1.0 * m;
   world_z = 3.0 * m;
 
-  pressVess_r_inner = 20.0 * cm;
+  pressVess_r_inner = 15.24 * cm;
   pressVess_dr = 2.0 * cm;
   pressVess_dz = 100.0 * cm;
 

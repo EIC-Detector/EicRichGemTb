@@ -204,11 +204,22 @@ EicRichGemTbMaterial::EicRichGemTbMaterial(){
     1.00059668004417, 1.00060250477064, 1.00060879733031, 1.00061561250462,
     1.00062301376631, 1.00063107505917, 1.00063988303241, 1.00064953987108};
 
+ //Absorbtion Length of CF4
+ //
+
+ G4double cf4_AbsorbtionLength[cf4_nEntries];
+ G4int j;
+ for(j = 0; j < cf4_nEntries; j++)
+   {
+     cf4_AbsorbtionLength[j] = 1*m;
+   }
   G4MaterialPropertiesTable* fMPT_cf4 = new G4MaterialPropertiesTable();
 
   fMPT_cf4->AddProperty("RINDEX", cf4_PhotonEnergy, cf4_RefractiveIndex, cf4_nEntries )->SetSpline(true);
 
   fMPT_cf4->AddConstProperty("SCINTILLATIONYIELD",50./MeV);
+
+  fMPT_cf4->AddProperty("ABSLENGTH", cf4_PhotonEnergy, cf4_AbsorbtionLength, cf4_nEntries);
 
   CF4->SetMaterialPropertiesTable(fMPT_cf4);
 

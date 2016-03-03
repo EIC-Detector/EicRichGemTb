@@ -117,6 +117,74 @@ G4VPhysicalVolume* EicRichGemTbDetectorConstruction::Construct()
                                                      "GasVolume",
                                                      world_log,false,0);
 
+  // The RICH Test Volume
+  //
+
+  G4Tubs* testVol_cyl = new G4Tubs( "TestVolume",
+                                   0,
+                                   getRichTbGeometry()->GetPressureVesselInnerRadius(),
+                                   0.001 * getRichTbGeometry()->GetPressureVesselLength(),
+                                   0,
+                                   2 * pi);
+
+  G4LogicalVolume* testVol_log = new G4LogicalVolume( testVol_cyl,
+                                                     getRichTbMaterial()->getCF4(),
+                                                     "TestVolume", 0, 0, 0 );
+
+  G4VPhysicalVolume* testVol_phys1 = new G4PVPlacement(0,
+						     G4ThreeVector(0, 0, 0.4*getRichTbGeometry()->GetPressureVesselLength()),
+                                                     testVol_log,
+                                                     "TestVolume",
+                                                     world_log,false,0);
+
+  G4VPhysicalVolume* testVol_phys2 = new G4PVPlacement(0,
+						     G4ThreeVector(0, 0, 0.3*getRichTbGeometry()->GetPressureVesselLength()),
+                                                     testVol_log,
+                                                     "TestVolume",
+                                                     world_log,false,0);
+
+  G4VPhysicalVolume* testVol_phys3 = new G4PVPlacement(0,
+						     G4ThreeVector(0, 0, 0.2*getRichTbGeometry()->GetPressureVesselLength()),
+                                                     testVol_log,
+                                                     "TestVolume",
+                                                     world_log,false,0);
+
+  G4VPhysicalVolume* testVol_phys4 = new G4PVPlacement(0,
+						     G4ThreeVector(0, 0, 0.1*getRichTbGeometry()->GetPressureVesselLength()),
+                                                     testVol_log,
+                                                     "TestVolume",
+                                                     world_log,false,0);
+
+  G4VPhysicalVolume* testVol_phys5 = new G4PVPlacement(0,
+						     G4ThreeVector(0, 0, 0.0*getRichTbGeometry()->GetPressureVesselLength()),
+                                                     testVol_log,
+                                                     "TestVolume",
+                                                     world_log,false,0);
+
+  G4VPhysicalVolume* testVol_phys6 = new G4PVPlacement(0,
+						     G4ThreeVector(0, 0, -0.1*getRichTbGeometry()->GetPressureVesselLength()),
+                                                     testVol_log,
+                                                     "TestVolume",
+                                                     world_log,false,0);
+
+  G4VPhysicalVolume* testVol_phys7 = new G4PVPlacement(0,
+						     G4ThreeVector(0, 0, -0.2*getRichTbGeometry()->GetPressureVesselLength()),
+                                                     testVol_log,
+                                                     "TestVolume",
+                                                     world_log,false,0);
+
+  G4VPhysicalVolume* testVol_phys8 = new G4PVPlacement(0,
+						     G4ThreeVector(0, 0, -0.3*getRichTbGeometry()->GetPressureVesselLength()),
+                                                     testVol_log,
+                                                     "TestVolume",
+                                                     world_log,false,0);
+
+  G4VPhysicalVolume* testVol_phys9 = new G4PVPlacement(0,
+						     G4ThreeVector(0, 0, -0.4*getRichTbGeometry()->GetPressureVesselLength()),
+                                                     testVol_log,
+                                                     "TestVolume",
+                                                     world_log,false,0);
+
   // The RICH Mirror
   //
   G4Tubs* richMirrorCylinder = new G4Tubs("RICHMirrorCylinder"
